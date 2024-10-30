@@ -22,34 +22,30 @@ const style = {
   p: 4,
 };
 
-// DateTime Formatter Function (from ViewAttendance.js)
 const formatDateTime = (dateTime, isTimeIn = false) => {
-  if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out";
-
-  // Create a new Date object with the provided dateTime
+  if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out"; // Handle null dateTime for timeIn and timeOut
+  
   const dateObj = new Date(dateTime);
-
-  // Get the offset in minutes between the local time and UTC
-  const offset = dateObj.getTimezoneOffset();
-
-  // Adjust the date object to the correct timezone (UTC+8 for Philippines)
-  const adjustedDateObj = new Date(dateObj.getTime() + offset * 60 * 1000);
-
-  // Format the date
-  const year = adjustedDateObj.getFullYear();
-  const month = String(adjustedDateObj.getMonth() + 1).padStart(2, '0');
-  const day = String(adjustedDateObj.getDate()).padStart(2, '0');
-
-  const formattedDate = `${month}-${day}-${year}`;
-
-  // Format the time
-  const hours = String(adjustedDateObj.getHours()).padStart(2, '0');
-  const minutes = String(adjustedDateObj.getMinutes()).padStart(2, '0');
-  const ampm = adjustedDateObj.getHours() >= 12 ? 'PM' : 'AM';
-
-  const formattedTime = `${hours}:${minutes} ${ampm}`;
-
-  return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
+  
+  // Get the date and time in ISO format (which is always UTC)
+  const isoDate = dateObj.toISOString();
+  
+  // Extract the date and time part
+  const dateParts = isoDate.split('T')[0].split('-'); // Split the date part
+  const year = dateParts[0]; // Get full year
+  const month = dateParts[1];
+  const day = dateParts[2];
+  
+  const formattedDate = `${month}-${day}-${year}`; // Format date as MM-DD-YYYY
+  
+  // Extract the time part
+  const time = isoDate.split('T')[1].slice(0, 5); // HH:mm in 24-hour format
+  
+  // Format it back to 12-hour format
+  const [hours, minutes] = time.split(':');
+  const hour12Format = `${((+hours + 11) % 12 + 1)}:${minutes} ${+hours >= 12 ? 'PM' : 'AM'}`;
+  
+  return isTimeIn ? { date: formattedDate, time: hour12Format } : { date: formattedDate, time: hour12Format };
 };
 
 export default function Attendance() {
@@ -91,6 +87,7 @@ export default function Attendance() {
       width: 250,
       headerClassName: "bold-header",
     },
+    { field: "outlet", headerName: "Outlet", width: 180, headerClassName: "bold-header" }, // New outlet column
     {
       field: "date",
       headerName: "Date",
@@ -138,7 +135,7 @@ export default function Attendance() {
     },
   ];
 
- // Function to fetch current attendance for a user
+// Update the fetchCurrentAttendance function
 async function fetchCurrentAttendance(emailAddress) {
   try {
     const response = await axios.post(
@@ -147,29 +144,27 @@ async function fetchCurrentAttendance(emailAddress) {
     );
     const data = response.data.data;
 
-    const today = new Date().toLocaleDateString();
-
-    const todaysAttendance = data.find(
-      (item) => new Date(item.date).toLocaleDateString() === today
-    );
-
-    if (todaysAttendance) {
-      const formattedTimeIn = formatDateTime(todaysAttendance.timeIn, true);
-      const formattedTimeOut = todaysAttendance.timeOut
-        ? formatDateTime(todaysAttendance.timeOut, false)
-        : { date: formattedTimeIn.date, time: "Time Out" }; // If no time out, keep default "Time Out"
-
+    if (data.length === 0) {
       return {
-        date: formattedTimeIn.date,
-        timeIn: formattedTimeIn.time,
-        timeOut: formattedTimeOut.time, // Time out is either the real time or the placeholder text
+        date: "No attendance today",
+        timeIn: "No Time In",
+        timeOut: "Time Out",
+        accountNameBranchManning: ""
       };
     }
 
+    const latestLog = data[data.length - 1];
+
+    const formattedTimeIn = formatDateTime(latestLog.timeIn, true);
+    const formattedTimeOut = latestLog.timeOut
+      ? formatDateTime(latestLog.timeOut, false)
+      : { date: formattedTimeIn.date, time: "Time Out" };
+
     return {
-      date: "No attendance today",
-      timeIn: "No Time In",
-      timeOut: "Time Out", // Default when no clock-out has occurred
+      date: formattedTimeIn.date,
+      timeIn: formattedTimeIn.time,
+      timeOut: formattedTimeOut.time,
+      accountNameBranchManning: latestLog.accountNameBranchManning
     };
   } catch (error) {
     console.error("Error fetching attendance:", error);
@@ -177,28 +172,28 @@ async function fetchCurrentAttendance(emailAddress) {
       date: "Error fetching attendance",
       timeIn: "Error",
       timeOut: "Error",
+      accountNameBranchManning: ""
     };
   }
 }
 
   // Fetch users and their current attendance
   async function getUser() {
-    await axios
-      .post("http://192.168.50.55:8080/get-all-user", body)
+    await axios.post("http://192.168.50.55:8080/get-all-user", body)
       .then(async (response) => {
         const data = await response.data.data;
-
+  
         // Fetch attendance data for each user
         const newData = await Promise.all(
-          data.map(async (data, key) => {
-            const attendance = await fetchCurrentAttendance(data.emailAddress);
-
+          data.map(async (user, key) => {
+            const attendance = await fetchCurrentAttendance(user.emailAddress);
             return {
               count: key + 1,
-              firstName: data.firstName,
-              middleName: data.middleName ? data.middleName : "null",
-              lastName: data.lastName,
-              emailAddress: data.emailAddress,
+              firstName: user.firstName,
+              middleName: user.middleName || "null",
+              lastName: user.lastName,
+              emailAddress: user.emailAddress,
+              outlet: attendance.accountNameBranchManning || "No Branch", // Display the attendance branch
               date: attendance.date,
               timeIn: attendance.timeIn,
               timeOut: attendance.timeOut,
@@ -208,7 +203,7 @@ async function fetchCurrentAttendance(emailAddress) {
         setUserData(newData);
       });
   }
-
+  
   React.useEffect(() => {
     getUser();
   }, []);
