@@ -86,19 +86,19 @@ export default function Inventory() {
     {
       field: "name",
       headerName: "Merchandiser",
-      width: 300,
+      width: 200,
       headerClassName: "bold-header",
     },
-    {
-      field: "UserEmail",
-      headerName: "Email",
-      width: 300,
-      headerClassName: "bold-header",
-    },
+    // {
+    //   field: "UserEmail",
+    //   headerName: "Email",
+    //   width: 300,
+    //   headerClassName: "bold-header",
+    // },
     {
       field: "accountNameBranchManning",
-      headerName: "Account Name Branch",
-      width: 350,
+      headerName: "Outlet",
+      width: 200,
       headerClassName: "bold-header",
     },
     {
@@ -120,21 +120,9 @@ export default function Inventory() {
       headerClassName: "bold-header",
     },
     {
-      field: "category",
-      headerName: "Category",
-      width: 150,
-      headerClassName: "bold-header",
-    },
-    {
       field: "skuDescription",
-      headerName: "SKU Description",
-      width: 350,
-      headerClassName: "bold-header",
-    },
-    {
-      field: "products",
-      headerName: "Products",
-      width: 200,
+      headerName: "SKU",
+      width: 280,
       headerClassName: "bold-header",
     },
     {
@@ -214,20 +202,14 @@ export default function Inventory() {
       headerName: "Remarks",
       width: 150,
       headerClassName: "bold-header",
-    },
-    {
-      field: "reasonOOS",
-      headerName: "Reason",
-      width: 220,
-      headerClassName: "bold-header",
-    },
+    }
   ];
 
   
 
   async function getUser() {
     await axios
-      .post("http://192.168.50.55:8080/retrieve-parcel-data")
+      .post("http://192.168.50.55:8080/inventory-data")
       .then(async (response) => {
         const data = await response.data.data;
         console.log(data, "test");
@@ -252,9 +234,9 @@ export default function Inventory() {
             period: data.period,
             month: data.month,
             week: data.week,
-            category: data.category,
+            //category: data.category,
             skuDescription: data.skuDescription,
-            products: data.products,
+            //products: data.products,
             skuCode: data.skuCode,
             status: data.status,
             beginningSA: value(data.status, data.beginningSA),
@@ -268,7 +250,7 @@ export default function Inventory() {
             inventoryDaysLevel: value(data.status, data.inventoryDaysLevel),
             noOfDaysOOS: value(data.status, data.noOfDaysOOS),
             remarksOOS: data.remarksOOS,
-            reasonOOS: data.reasonOOS
+            //reasonOOS: data.reasonOOS
           };
         });
         console.log(newData, "testing par");
@@ -304,9 +286,9 @@ export default function Inventory() {
             period: data.period,
             month: data.month,
             week: data.week,
-            category: data.category,
+            //category: data.category,
             skuDescription: data.skuDescription,
-            products: data.products,
+            //products: data.products,
             skuCode: data.skuCode,
             status: data.status,
             beginningSA: value(data.status, data.beginningSA),
@@ -320,7 +302,7 @@ export default function Inventory() {
             inventoryDaysLevel: value(data.status, data.inventoryDaysLevel),
             noOfDaysOOS: value(data.status, data.noOfDaysOOS),
             remarksOOS: data.remarksOOS,
-            reasonOOS: data.reasonOOS
+            //reasonOOS: data.reasonOOS
           };
         });
         console.log(newData, "testing par");

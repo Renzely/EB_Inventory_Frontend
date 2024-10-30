@@ -53,18 +53,20 @@ const formatDateTime = (dateTime, isTimeIn = false) => {
         { userEmail: emailAddress }
       );
       let data = response.data.data;
-
+      
+      console.log("Raw attendance data:", data);
+      
       // Get today's date in the formatted form
       const today = new Date();
       const formattedTodayDate = formatDateTime(today).date;
-
-      // Check if there's an entry for today
+  
+      console.log("Checking for today's entry...");
       const hasTodayEntry = data.some(
         (item) => formatDateTime(item.date)?.date === formattedTodayDate
       );
-
+  
       if (!hasTodayEntry) {
-        // Add a placeholder entry for today
+        console.log("Adding placeholder entry for today");
         data.unshift({
           _id: "placeholder", // Placeholder ID
           date: today,
@@ -74,35 +76,49 @@ const formatDateTime = (dateTime, isTimeIn = false) => {
           timeOutLocation: "No location", // Default location for placeholder
         });
       }
+  
+      console.log("After adding placeholder:", data);
+      console.log('Received attendance data:', response.data.data);
 
-      // Add a count and format date and time
-      const formattedData = data.map((item, index) => {
-        const formattedDate = formatDateTime(item.date);
-        const formattedTimeIn = formatDateTime(item.timeIn);
-        const formattedTimeOut = formatDateTime(item.timeOut);
-        return {
-          ...item,
-          date: formattedDate.date || "N/A",
-          timeIn: formattedTimeIn.time || "No Time In",
-          timeOut: formattedTimeOut.time || "No Time Out",
-          timeInLocation: item.timeInLocation || "No location",
-          timeOutLocation: item.timeOutLocation || "No location",
-        };
-      });
+// In your fetchAttendanceData function
+const formattedData = data.map((item, index) => {
+  console.log("Processing item:", item);
+  
+  const formattedDate = formatDateTime(item.date);
+  const formattedTimeIn = formatDateTime(item.timeIn);
+  const formattedTimeOut = formatDateTime(item.timeOut);
+  return {
+    ...item,
+    date: formattedDate.date || "N/A",
+    timeIn: formattedTimeIn.time || "No Time In",
+    timeOut: formattedTimeOut.time || "No Time Out",
+    timeInLocation: item.timeInLocation || "No location",
+    timeOutLocation: item.timeOutLocation || "No location", // Matched to the schema
+    accountNameBranchManning: item.accountNameBranchManning || "Unknown Outlet"
+  };
+});
 
+
+
+  
+      console.log("Formatted data:", formattedData);
+  
       // Sort data by date in descending order
       formattedData.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+  
+      console.log("Sorted data:", formattedData);
+  
       // Update the count field to match the sorted order
       formattedData.forEach((item, index) => {
         item.count = index + 1;
       });
-
+  
       setAttendanceData(formattedData);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     }
   }
+  
 
   // Fetch attendance data when userEmail changes
   useEffect(() => {
@@ -115,25 +131,32 @@ const formatDateTime = (dateTime, isTimeIn = false) => {
     { field: "count", headerName: "#", width: 100, headerClassName: "bold-header" },
     { field: "date", headerName: "Date", width: 200, headerClassName: "bold-header" },
     { field: "timeIn", headerName: "Time In", width: 150, headerClassName: "bold-header" },
-    { field: "timeInLocation", headerName: "Location", width: 200, headerClassName: "bold-header" },
-    { field: "timeOut", headerName: "Time Out", width: 150, headerClassName: "bold-header" },
-    { field: "timeOutLocation", headerName: "Time Out Location", width: 180, headerClassName: "bold-header" },
-    {
-      field: "currentAttendance",
-      headerName: "",
-      width: 250,
-      renderCell: (params) => {
-        if (params.row.count === 1) {
-          return (
-            <span style={{ color: 'green', fontWeight: 'bold' }}>
-              CURRENT ATTENDANCE
-            </span>
-          );
-        }
-        return "";
-      },
+    { field: "timeInLocation", headerName: "Time In Location", width: 250, headerClassName: "bold-header" },
+    { field: "timeOut", headerName: "Time Out", width: 180, headerClassName: "bold-header" },
+    { 
+      field: "timeOutLocation", 
+      headerName: "Time Out Location", 
+      width: 250, 
       headerClassName: "bold-header",
     },
+    
+    { field: "accountNameBranchManning", headerName: "Outlet", width: 180, headerClassName: "bold-header" },
+    // {
+    //   field: "currentAttendance",
+    //   headerName: "",
+    //   width: 250,
+    //   renderCell: (params) => {
+    //     if (params.row.count === 1) {
+    //       return (
+    //         <span style={{ color: 'green', fontWeight: 'bold' }}>
+    //           CURRENT ATTENDANCE
+    //         </span>
+    //       );
+    //     }
+    //     return "";
+    //   },
+    //   headerClassName: "bold-header",
+    // },
   ];
 
   return (
