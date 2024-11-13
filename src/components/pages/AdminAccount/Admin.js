@@ -376,42 +376,42 @@ export default function Admin() {
     {
       field: "count",
       headerName: "#",
-      width: 100,
+      width: 75,
       headerClassName: "bold-header",
     },
     {
       field: "roleAccount",
-      headerName: "Role",
+      headerName: "ROLE",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "accountNameBranchManning",
-      headerName: "Branch",
+      headerName: "OUTLETS",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "firstName",
-      headerName: "First name",
+      headerName: "FIRST NAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "middleName",
-      headerName: "Middle name",
+      headerName: "MIDDLE NAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "lastName",
-      headerName: "Last name",
+      headerName: "LAST NAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "emailAddress",
-      headerName: "Email",
+      headerName: "EMAIL",
       width: 250,
       headerClassName: "bold-header",
     },
@@ -420,13 +420,9 @@ export default function Admin() {
       headerName: "Contact Number",
       headerClassName: "bold-header",
     },
-    //   {
-    //     field: 'date_join',
-    //     headerName: 'Date Join',
-    //   },
     {
       field: "isActive",
-      headerName: "Status",
+      headerName: "STATUS",
       headerClassName: "bold-header",
       width: 150,
       sortable: false,
@@ -453,8 +449,8 @@ export default function Admin() {
                   style={{
                     width: "70%",
                     marginTop: "13px",
-                    backgroundColor: "#90EE90",
-                    color: "#000000",
+                    backgroundColor: "#1a1447",
+                    color: "WHITE",
                   }}
                   onClick={onClick}
                 >
@@ -523,7 +519,7 @@ export default function Admin() {
               style={{
                 width: "50%",
                 marginTop: "13px",
-                backgroundColor: "#008000",
+                backgroundColor: "#1a1447",
                 color: "#FFFFF",
               }}
             >
@@ -745,7 +741,7 @@ export default function Admin() {
             <Button
               onClick={handleOpenDialog}
               variant="contained"
-              style={{ backgroundColor: "#008000", color: "#FFFFF" }}
+              style={{ backgroundColor: "#1a1447", color: "#FFFFF" }}
               endIcon={<PersonAddAlt1Icon />}
             >
               Add User

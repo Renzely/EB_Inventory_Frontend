@@ -8,3 +8,19 @@
 .bold-header .MuiDataGrid-columnHeaderTitle {
     font-weight: bold;
   }
+
+  .bold-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  
+  .left-align-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    font-weight: bold;
+    padding-left: 8px; /* Add padding if you need some space from the edge */
+  }
+  

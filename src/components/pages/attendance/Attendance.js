@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import Topbar from "../../topbar/Topbar";
 import Sidebar from "../../sidebar/Sidebar";
 
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -25,27 +26,21 @@ const style = {
 const formatDateTime = (dateTime, isTimeIn = false) => {
   if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out"; // Handle null dateTime for timeIn and timeOut
   
-  const dateObj = new Date(dateTime);
+  const dateObj = new Date(dateTime);  // This will parse the UTC time and convert it to local time
   
-  // Get the date and time in ISO format (which is always UTC)
-  const isoDate = dateObj.toISOString();
+  // Format the date as MM-DD-YYYY
+  const formattedDate = `${dateObj.getMonth() + 1}-${dateObj.getDate()}-${dateObj.getFullYear()}`;
   
-  // Extract the date and time part
-  const dateParts = isoDate.split('T')[0].split('-'); // Split the date part
-  const year = dateParts[0]; // Get full year
-  const month = dateParts[1];
-  const day = dateParts[2];
-  
-  const formattedDate = `${month}-${day}-${year}`; // Format date as MM-DD-YYYY
-  
-  // Extract the time part
-  const time = isoDate.split('T')[1].slice(0, 5); // HH:mm in 24-hour format
-  
-  // Format it back to 12-hour format
+  // Format the time as HH:mm (24-hour format)
+  const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Convert to 12-hour format with AM/PM
   const [hours, minutes] = time.split(':');
-  const hour12Format = `${((+hours + 11) % 12 + 1)}:${minutes} ${+hours >= 12 ? 'PM' : 'AM'}`;
-  
-  return isTimeIn ? { date: formattedDate, time: hour12Format } : { date: formattedDate, time: hour12Format };
+  const hour12Format = `${((+hours + 11) % 12 + 1)}:${minutes} ${+hours >= 12 ? '' : ''}`;
+
+  return isTimeIn 
+    ? { date: formattedDate, time: hour12Format } 
+    : { date: formattedDate, time: hour12Format };
 };
 
 export default function Attendance() {
@@ -60,55 +55,38 @@ export default function Attendance() {
     {
       field: "count",
       headerName: "#",
-      width: 100,
+      width: 75,
       headerClassName: "bold-header",
     },
     {
-      field: "firstName",
-      headerName: "First name",
-      width: 150,
+      field: "fullName",
+      headerName: "FULL NAME",
+      width: 200,
       headerClassName: "bold-header",
     },
-    {
-      field: "middleName",
-      headerName: "Middle name",
-      width: 150,
-      headerClassName: "bold-header",
-    },
-    {
-      field: "lastName",
-      headerName: "Last name",
-      width: 150,
-      headerClassName: "bold-header",
-    },
-    {
-      field: "emailAddress",
-      headerName: "Email",
-      width: 250,
-      headerClassName: "bold-header",
-    },
-    { field: "outlet", headerName: "Outlet", width: 180, headerClassName: "bold-header" }, // New outlet column
+
+    { field: "outlet", headerName: "OUTLET", width: 180, headerClassName: "bold-header" }, // New outlet column
     {
       field: "date",
-      headerName: "Date",
-      width: 180,
+      headerName: "DATE",
+      width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "timeIn",
-      headerName: "Time In",
+      headerName: "TIME IN",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "timeOut",
-      headerName: "Time Out",
+      headerName: "TIME OUT",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "action",
-      headerName: "Action",
+      headerName: "ATTENDANCE HISTORY",
       headerClassName: "bold-header",
       width: 180,
       sortable: false,
@@ -124,9 +102,9 @@ export default function Attendance() {
               <Button
                 variant="contained"
                 size="small"
-                style={{ backgroundColor: "#4caf50", color: "#ffffff" }} // Green color with white text
+                style={{ backgroundColor: "#1a1447", color: "#ffffff" }} // Green color with white text
               >
-                Attendance
+                VIEW
               </Button>
             </Link>
           </Stack>
@@ -135,47 +113,77 @@ export default function Attendance() {
     },
   ];
 
-// Update the fetchCurrentAttendance function
-async function fetchCurrentAttendance(emailAddress) {
-  try {
-    const response = await axios.post(
-      "http://192.168.50.55:8080/get-attendance",
-      { userEmail: emailAddress }
-    );
-    const data = response.data.data;
-
-    if (data.length === 0) {
+  async function fetchCurrentAttendance(emailAddress, currentDate = new Date()) {
+    const formattedDate = currentDate.toISOString().split('T')[0];
+  
+    try {
+      const response = await axios.post(
+        "http://192.168.50.55:8080/get-attendance",
+        { userEmail: emailAddress, date: formattedDate }
+      );
+      const data = response.data.data;
+  
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format');
+      }
+  
+      if (data.length === 0) {
+        // No logs found, return default values
+        return {
+          date: formattedDate,
+          timeIn: "No Time In",
+          timeOut: "No Time Out",
+          accountNameBranchManning: ""
+        };
+      }
+  
+      const latestLog = data[data.length - 1];
+      const latestLogDate = latestLog.date.split('T')[0]; // Assuming date is in ISO format
+  
+      let accountNameBranchManning = latestLog.accountNameBranchManning || "";
+  
+      if (latestLogDate !== formattedDate) {
+        // New day has started, reset attendance and set branch to "No Branch"
+        return {
+          date: formattedDate,
+          timeIn: "No Time In",
+          timeOut: "No Time Out",
+          accountNameBranchManning: "No Branch"
+        };
+      }
+  
+      if (!latestLog.timeLogs || latestLog.timeLogs.length === 0) {
+        return {
+          date: formattedDate,
+          timeIn: "No Time In",
+          timeOut: "No Time Out",
+          accountNameBranchManning: accountNameBranchManning
+        };
+      }
+  
+      const timeLog = latestLog.timeLogs[latestLog.timeLogs.length - 1];
+  
+      const timeIn = timeLog.timeIn ? formatDateTime(timeLog.timeIn) : "No Time In";
+      const timeOut = timeLog.timeOut ? formatDateTime(timeLog.timeOut) : "No Time Out";
+  
       return {
-        date: "No attendance today",
-        timeIn: "No Time In",
-        timeOut: "Time Out",
+        date: timeLog.timeIn ? timeLog.timeIn.slice(0, 10) : formattedDate,
+        timeIn: timeIn.time,
+        timeOut: timeOut.time,
+        accountNameBranchManning: accountNameBranchManning
+      };
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      return {
+        date: formattedDate,
+        timeIn: "Error",
+        timeOut: "Error",
         accountNameBranchManning: ""
       };
     }
-
-    const latestLog = data[data.length - 1];
-
-    const formattedTimeIn = formatDateTime(latestLog.timeIn, true);
-    const formattedTimeOut = latestLog.timeOut
-      ? formatDateTime(latestLog.timeOut, false)
-      : { date: formattedTimeIn.date, time: "Time Out" };
-
-    return {
-      date: formattedTimeIn.date,
-      timeIn: formattedTimeIn.time,
-      timeOut: formattedTimeOut.time,
-      accountNameBranchManning: latestLog.accountNameBranchManning
-    };
-  } catch (error) {
-    console.error("Error fetching attendance:", error);
-    return {
-      date: "Error fetching attendance",
-      timeIn: "Error",
-      timeOut: "Error",
-      accountNameBranchManning: ""
-    };
   }
-}
+  
+  
 
   // Fetch users and their current attendance
   async function getUser() {
@@ -189,6 +197,7 @@ async function fetchCurrentAttendance(emailAddress) {
             const attendance = await fetchCurrentAttendance(user.emailAddress);
             return {
               count: key + 1,
+              fullName: `${user.firstName} ${user.lastName}`, 
               firstName: user.firstName,
               middleName: user.middleName || "null",
               lastName: user.lastName,

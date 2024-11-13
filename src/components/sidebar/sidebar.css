@@ -18,7 +18,7 @@
 
 .sidebarTitle {
   font-size: 13px;
-  color: rgb(0, 100, 0);
+  color: rgb(	26, 20, 71);
 }
 
 .sidebarList {
@@ -32,10 +32,10 @@
   display: flex;
   align-items: center;
   border-radius: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   transition: backgroud-color 0.3s;
   width: 150px;
-  color: rgb(0, 0, 0)
+  color: rgb(	26, 20, 71)
 }
 
 .sidebarListItem.active,
@@ -46,7 +46,7 @@
 .sidebarIcon {
   margin-right: 5px;
   font-size: 20px;
-  color: black;
+  color:  rgb(	26, 20, 71);
 }
 
 .sidebarListItem.active{
@@ -62,13 +62,13 @@
 
 .sidebarUserName  {
   font-weight: normal; /* Set default font weight to normal */
-  font-size: 0.85rem; /* Ensure that the normal text is larger than the label */
-  color: rgb(0, 0, 0);
+  font-size: 0.75rem; /* Ensure that the normal text is larger than the label */
+  color: rgb(	26, 20, 71);
 }
 .sidebarUserRole {
   font-weight: normal; /* Set default font weight to normal */
-  font-size: 0.85rem; /* Ensure that the normal text is larger than the label */
-  color: rgb(0, 0, 0);
+  font-size: 0.75rem; /* Ensure that the normal text is larger than the label */
+  color: rgb(	26, 20, 71);
 }
 
 

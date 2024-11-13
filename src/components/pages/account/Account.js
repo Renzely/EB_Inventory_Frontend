@@ -160,58 +160,58 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
   };
 
   const columns = [
-    { field: "count", headerName: "#", width: 100 },
+    { field: "count", headerName: "#", width: 75 },
     {
       field: "firstName",
-      headerName: "First name",
+      headerName: "FIRST NAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "middleName",
-      headerName: "Middle name",
+      headerName: "MIDDLE NAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "lastName",
-      headerName: "Last name",
+      headerName: "LAST NAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "username",
-      headerName: "Username",
+      headerName: "USERNAME",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "emailAddress",
-      headerName: "Email",
+      headerName: "EMAIL ADDRESS",
       width: 250,
       headerClassName: "bold-header",
     },
     {
       field: "remarks",
-      headerName: "Remarks",
+      headerName: "REMARKS",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "contactNum",
-      headerName: "Contact Number",
-      width: 150,
+      headerName: "CONTACT NUMBER",
+      width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "Branch",
-      headerName: "Account Name Branch",
-      width: 250,
+      headerName: "OUTLETS",
+      width: 300,
       headerClassName: "bold-header",
     },
     {
       field: "isActive",
-      headerName: "Status",
+      headerName: "STATUS",
       headerClassName: "bold-header",
       width: 150,
       sortable: false,
@@ -240,8 +240,8 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
                   style={{
                     width: "50%",
                     marginTop: "13px",
-                    backgroundColor: "#90EE90",
-                    color: "#000000",
+                    backgroundColor: "#1a1447",
+                    color: "white",
                   }}
                   onClick={onClick}
                   disabled={!isAllowed}
@@ -270,7 +270,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
     {
       field: "action",
       headerClassName: "bold-header",
-      headerName: "Action",
+      headerName: "ACTION",
       width: 90,
       sortable: false,
       disableClickEventBubbling: true,
@@ -311,7 +311,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
               style={{
                 width: "50%",
                 marginTop: "13px",
-                backgroundColor: "#008000",
+                backgroundColor: "#1a1447",
                 color: "#FFFFF",
               }}
             >
@@ -406,7 +406,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
             disableDensitySelector
             disableColumnFilter
             disableColumnSelector
-            pageSizeOptions={[5, 10, 20, 50, 100, 200]}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
             getRowId={(row) => row.count}
             disableRowSelectionOnClick
           />
