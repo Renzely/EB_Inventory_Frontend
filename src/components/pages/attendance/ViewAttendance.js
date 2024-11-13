@@ -17,32 +17,19 @@ export default function ViewAttendance() {
   const userEmail = location.state?.userEmail || "";
 
   // Function to format date and time
-const formatDateTime = (dateTime, isTimeIn = false) => {
-  if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out"; // Handle null dateTime for timeIn and timeOut
-  
-  const dateObj = new Date(dateTime);
-  
-  // Get the date and time in ISO format (which is always UTC)
-  const isoDate = dateObj.toISOString();
-  
-  // Extract the date and time part
-  const dateParts = isoDate.split('T')[0].split('-'); // Split the date part
-  const year = dateParts[0]; // Get full year
-  const month = dateParts[1];
-  const day = dateParts[2];
-  
-  const formattedDate = `${month}-${day}-${year}`; // Format date as MM-DD-YYYY
-  
-  // Extract the time part
-  const time = isoDate.split('T')[1].slice(0, 5); // HH:mm in 24-hour format
-  
-  // Format it back to 12-hour format
-  const [hours, minutes] = time.split(':');
-  const hour12Format = `${((+hours + 11) % 12 + 1)}:${minutes} ${+hours >= 12 ? 'PM' : 'AM'}`;
-  
-  return isTimeIn ? { date: formattedDate, time: hour12Format } : { date: formattedDate, time: hour12Format };
-};
+  const formatDateTime = (dateTime, isTimeIn = false) => {
+    if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out"; // Handle null dateTime for timeIn and timeOut
 
+    const dateObj = new Date(dateTime);
+
+    // Format the date as MM-DD-YYYY
+    const formattedDate = format(dateObj, 'MM-dd-yyyy');
+
+    // Format the time as HH:mm (12-hour format)
+    const formattedTime = format(dateObj, 'h:mm a');
+
+    return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
+  };
   
 
   // Fetch attendance data for the specific user
@@ -59,52 +46,57 @@ const formatDateTime = (dateTime, isTimeIn = false) => {
       // Get today's date in the formatted form
       const today = new Date();
       const formattedTodayDate = formatDateTime(today).date;
-  
+    
       console.log("Checking for today's entry...");
       const hasTodayEntry = data.some(
         (item) => formatDateTime(item.date)?.date === formattedTodayDate
       );
-  
-      if (!hasTodayEntry) {
-        console.log("Adding placeholder entry for today");
-        data.unshift({
-          _id: "placeholder", // Placeholder ID
-          date: today,
-          timeIn: null,
-          timeOut: null,
-          timeInLocation: "No location", // Default location for placeholder
-          timeOutLocation: "No location", // Default location for placeholder
-        });
-      }
-  
+    
+      // if (!hasTodayEntry) {
+      //   console.log("Adding placeholder entry for today");
+      //   data.unshift({
+      //     _id: "placeholder", // Placeholder ID
+      //     date: today,
+      //     timeLogs: [
+      //       {
+      //         timeIn: null,
+      //         timeOut: null,
+      //         timeInLocation: "No location",
+      //         timeOutLocation: "No location",
+      //       },
+      //     ],
+      //     accountNameBranchManning: "Unknown Outlet",
+      //   });
+      // }
+    
       console.log("After adding placeholder:", data);
       console.log('Received attendance data:', response.data.data);
-
-// In your fetchAttendanceData function
-const formattedData = data.map((item, index) => {
-  console.log("Processing item:", item);
   
-  const formattedDate = formatDateTime(item.date);
-  const formattedTimeIn = formatDateTime(item.timeIn);
-  const formattedTimeOut = formatDateTime(item.timeOut);
-  return {
-    ...item,
-    date: formattedDate.date || "N/A",
-    timeIn: formattedTimeIn.time || "No Time In",
-    timeOut: formattedTimeOut.time || "No Time Out",
-    timeInLocation: item.timeInLocation || "No location",
-    timeOutLocation: item.timeOutLocation || "No location", // Matched to the schema
-    accountNameBranchManning: item.accountNameBranchManning || "Unknown Outlet"
-  };
-});
-
-
-
+      // Format data including timeLogs for each day entry
+      const formattedData = data.flatMap((item) => {
+        // For each timeLog in the timeLogs array, create a row
+        return item.timeLogs.map((timeLog, index) => {
+          const formattedDate = formatDateTime(item.date);
+          const formattedTimeIn = formatDateTime(timeLog.timeIn);
+          const formattedTimeOut = formatDateTime(timeLog.timeOut);
+  
+          return {
+            ...item,
+            date: formattedDate.date || "N/A",
+            timeIn: formattedTimeIn.time || "No Time In",
+            timeOut: formattedTimeOut.time || "No Time Out",
+            timeInLocation: timeLog.timeInLocation || "No location",
+            timeOutLocation: timeLog.timeOutLocation || "No location",
+            accountNameBranchManning: item.accountNameBranchManning || "Unknown Outlet",
+            count: index + 1, // Assign count based on the index of the timeLog
+          };
+        });
+      });
   
       console.log("Formatted data:", formattedData);
   
       // Sort data by date in descending order
-      formattedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+      formattedData.sort((b, a) => new Date(a.date) - new Date(b.date));
   
       console.log("Sorted data:", formattedData);
   
@@ -129,18 +121,18 @@ const formattedData = data.map((item, index) => {
 
   const columns = [
     { field: "count", headerName: "#", width: 100, headerClassName: "bold-header" },
-    { field: "date", headerName: "Date", width: 200, headerClassName: "bold-header" },
-    { field: "timeIn", headerName: "Time In", width: 150, headerClassName: "bold-header" },
-    { field: "timeInLocation", headerName: "Time In Location", width: 250, headerClassName: "bold-header" },
-    { field: "timeOut", headerName: "Time Out", width: 180, headerClassName: "bold-header" },
+    { field: "date", headerName: "DATE", width: 120, headerClassName: "bold-header" },
+    { field: "timeIn", headerName: "TIME IN", width: 120, headerClassName: "bold-header" },
+    { field: "timeInLocation", headerName: "TIME IN LOCATION", width: 330, headerClassName: "bold-header" },
+    { field: "timeOut", headerName: "TIME OUT", width: 120, headerClassName: "bold-header" },
     { 
       field: "timeOutLocation", 
-      headerName: "Time Out Location", 
-      width: 250, 
+      headerName: "TIME OUT LOCATION", 
+      width: 330, 
       headerClassName: "bold-header",
     },
     
-    { field: "accountNameBranchManning", headerName: "Outlet", width: 180, headerClassName: "bold-header" },
+    { field: "accountNameBranchManning", headerName: "OUTLET", width: 180, headerClassName: "bold-header" },
     // {
     //   field: "currentAttendance",
     //   headerName: "",
@@ -168,7 +160,7 @@ const formattedData = data.map((item, index) => {
           <Typography variant="h4" gutterBottom>
             Attendance for {userEmail}
           </Typography>
-          <Box sx={{ height: 400, width: "99%" }}>
+          <Box sx={{ height: 400, width: "100%" }}>
             <DataGrid
               rows={attendanceData}
               columns={columns}

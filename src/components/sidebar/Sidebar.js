@@ -108,6 +108,21 @@ export default function Sidebar() {
             </NavLink>
 
             <NavLink
+              to="/view-RTV"
+              style={{ textDecoration: "none" }}
+              onClick={() => handleItemClick("/view-RTV")}
+            >
+              <li
+                className={`sidebarListItem ${
+                  activeItem === "/view-RTV" ? "active" : ""
+                }`}
+              >
+                <AssignmentReturnIcon className="sidebarIcon" />
+                RTV
+              </li>
+            </NavLink>
+
+            <NavLink
               to="/view-outletinputs"
               style={{ textDecoration: "none" }}
               onClick={() => handleItemClick("/view-outlet")}>
@@ -117,24 +132,11 @@ export default function Sidebar() {
                 }`}
               >
                 <StoreIcon className="sidebarIcon" />
-                Outlet Inputs
+                Outlet Count
               </li>
             </NavLink>
 
-            <NavLink
-              to="/view-RTV"
-              style={{ textDecoration: "none" }}
-              onClick={() => handleItemClick("/view-RTV")}
-            >
-              {/* <li
-                className={`sidebarListItem ${
-                  activeItem === "/view-RTV" ? "active" : ""
-                }`}
-              >
-                <AssignmentReturnIcon className="sidebarIcon" />
-                RTV
-              </li> */}
-            </NavLink>
+            
             <li className="sidebarListItem" onClick={() => handleLogout()}>
               <LogoutIcon className="sidebarIcon" />
               Logout

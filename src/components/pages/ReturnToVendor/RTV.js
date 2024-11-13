@@ -52,56 +52,73 @@ export default function RTV() {
     { field: "count", headerName: "#", width: 75 },
     {
       field: "date",
-      headerName: "Date",
+      headerName: "DATE",
       width: 150,
       headerClassName: 'bold-header'
     },
-
     {
-      field: "merchandiserName",
-      headerName: "Merchandiser Name",
-      width: 220,
+      field: "inputId",
+      headerName: "RTV NUMBER",
+      width: 150,
       headerClassName: 'bold-header'
     },
     {
-      field: "UserEmail",
-      headerName: "Email",
-      width: 220,
+      field: "merchandiserName",
+      headerName: "MERCHANDISER",
+      width: 180,
+      headerClassName: 'bold-header'
+    },
+    {
+      field: "outlet",
+      headerName: "OUTLET",
+      width: 150,
       headerClassName: 'bold-header'
     },
     {
       field: "item",
-      headerName: "Item",
+      headerName: "SKU",
       width: 220,
       headerClassName: 'bold-header'
     },
     {
+      field: "expiryDate",
+      headerName: "EXPIRY DATE",
+      width: 200,
+      headerClassName: 'bold-header'
+    },
+    {
+      field: "amount",
+      headerName: "AMOUNT",
+      width: 150,
+      headerClassName: 'bold-header'
+    },
+    {
       field: "quantity",
-      headerName: "Quantity",
+      headerName: "QUANTITY",
       width: 150,
       headerClassName: 'bold-header'
     },
     {
-      field: "driverName",
-      headerName: "Driver Name",
-      width: 200,
+      field: "total",
+      headerName: "TOTAL",
+      width: 180,
       headerClassName: 'bold-header'
     },
     {
-      field: "plateNumber",
-      headerName: "Plate Number",
+      field: "reason",
+      headerName: "REASON",
       width: 150,
       headerClassName: 'bold-header'
     },
     {
-      field: "pullOutReason",
-      headerName: "Pull Out Reason",
+      field: "remarks",
+      headerName: "REMARKS",
       width: 200,
       headerClassName: 'bold-header'
-      //type: buttonBaseClasses,
     },
+  
 
-    // {
+    // {expiryFields
     //   field: "action",
     //   headerName: "Action",
     //   width: 200,
@@ -152,30 +169,38 @@ export default function RTV() {
     await axios
         .post("http://192.168.50.55:8080/retrieve-RTV-data")
         .then(async (response) => {
-            const data = await response.data.data;
+            const data = response.data?.data || [];
             console.log(data, "test");
 
-            // Sort the data in descending order by date
-            const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Sort the data in descending order by date, only if data is not empty
+            const sortedData = data.length ? data.sort((a, b) => new Date(b.date) - new Date(a.date)) : [];
 
             const newData = sortedData.map((data, key) => {
                 return {
                     count: key + 1,
                     date: data.date,
+                    inputId: data.inputId,
                     merchandiserName: data.merchandiserName,
                     UserEmail: data.userEmail,
                     outlet: data.outlet,
                     item: data.item,
+                    amount: data.amount,
                     quantity: data.quantity,
-                    driverName: data.driverName,
-                    plateNumber: data.plateNumber,
-                    pullOutReason: data.pullOutReason,
+                    total: data.total,
+                    remarks: data.remarks,
+                    reason: data.reason,
+                    expiryDate: data.expiryDate,
                 };
             });
             console.log(newData, "testing par");
             setUserData(newData);
+        })
+        .catch((error) => {
+            console.error("Error fetching RTV data:", error);
+            setUserData([]); // Set to an empty array if there's an error
         });
 }
+
 
 async function getDateRTV(selectedDate) {
     const data = { selectDate: selectedDate };
@@ -192,6 +217,7 @@ async function getDateRTV(selectedDate) {
                 return {
                     count: key + 1,
                     date: data.date,
+                    inputId: data.inputId,
                     merchandiserName: data.merchandiserName,
                     UserEmail: data.userEmail,
                     outlet: data.outlet,
@@ -269,7 +295,7 @@ async function getDateRTV(selectedDate) {
           disableColumnFilter
           disableColumnSelector
           disableRowSelectionOnClick
-          pageSizeOptions={[5, 10, 20, 30, 50, 100, 200]}
+          pageSizeOptions={[5, 10, 20, 30, 50, 100]}
           getRowId={(row) => row.count}
         />
       </div>

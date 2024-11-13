@@ -68,24 +68,24 @@ export default function Inventory() {
     {
       field: "count",
       headerName: "#",
-      width: 150,
+      width: 75,
       headerClassName: "bold-header",
     },
     {
       field: "date",
-      headerName: "Date",
-      width: 200,
+      headerName: "DATE",
+      width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "inputId",
-      headerName: "Input ID",
+      headerName: "INVENTORY NUMBER",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "name",
-      headerName: "Merchandiser",
+      headerName: "MERCHANDISER",
       width: 200,
       headerClassName: "bold-header",
     },
@@ -97,25 +97,25 @@ export default function Inventory() {
     // },
     {
       field: "accountNameBranchManning",
-      headerName: "Outlet",
+      headerName: "OUTLET",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "period",
-      headerName: "Period",
+      headerName: "PERIOD",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "month",
-      headerName: "Month",
+      headerName: "MONTH",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "week",
-      headerName: "Week",
+      headerName: "WEEK",
       width: 150,
       headerClassName: "bold-header",
     },
@@ -127,67 +127,67 @@ export default function Inventory() {
     },
     {
       field: "skuCode",
-      headerName: "SKU Code",
+      headerName: "4-PACK BARCODE",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "status",
-      headerName: "Status",
+      headerName: "STATUS",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "beginningSA",
-      headerName: "Beginning (Selling Area)",
+      headerName: "BEGINNING (Selling Area)",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "beginningWA",
-      headerName: "Beginning (Warehouse Area)",
+      headerName: "BEGINNING (Warehouse Area)",
       width: 230,
       headerClassName: "bold-header",
     },
     {
       field: "beginning",
-      headerName: "Beginning",
+      headerName: "TOTAL BEGINNING",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "delivery",
-      headerName: "Delivery",
+      headerName: "DELIVERY",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "endingSA",
-      headerName: "Ending (Selling Area)",
+      headerName: "ENDING (Selling Area)",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "endingWA",
-      headerName: "Ending (Warehouse Area)",
+      headerName: "ENDING (Warehouse Area)",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "ending",
-      headerName: "Ending",
+      headerName: "TOTAL ENDING",
       width: 150,
       headerClassName: "bold-header",
     },
     {
       field: "offtake",
-      headerName: "Offtake",
+      headerName: "OFFTAKE",
       width: 200,
       headerClassName: "bold-header",
     },
     {
       field: "inventoryDaysLevel",
-      headerName: "InventoryDaysLevel",
+      headerName: "IDL",
       width: 200,
       headerClassName: "bold-header",
     },
@@ -199,7 +199,7 @@ export default function Inventory() {
     },
     {
       field: "remarksOOS",
-      headerName: "Remarks",
+      headerName: "REMARKS",
       width: 150,
       headerClassName: "bold-header",
     }
@@ -375,7 +375,7 @@ export default function Inventory() {
             disableColumnFilter
             disableColumnSelector
             disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 20, 30, 50, 100, 200]}
+            pageSizeOptions={[5, 10, 20, 30, 50, 100]}
             getRowId={(row) => row.count}
           />
         </div>
