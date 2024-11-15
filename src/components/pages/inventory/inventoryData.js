@@ -180,6 +180,29 @@ export default function Inventory() {
       headerClassName: "bold-header",
     },
     {
+      field: "expiryFields",
+      headerName: "EXPIRY FIELDS",
+      width: 350,
+      headerClassName: "bold-header",
+      renderCell: (params) => {
+        const expiryFields = params.value; // This is the array of expiry objects
+        
+        if (Array.isArray(expiryFields) && expiryFields.length > 0) {
+          return (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              {expiryFields.map((field, index) => (
+                <div key={index} style={{ display: "flex", flexDirection: "row" }}>
+                  {`MONTH: ${field.expiryMonth} PCS: ${field.expiryPcs} ||`}
+                </div>
+              ))}
+            </div>
+          );
+        }
+    
+        return "No expiry fields";
+      },
+    },    
+    {
       field: "offtake",
       headerName: "OFFTAKE",
       width: 200,
@@ -212,7 +235,7 @@ export default function Inventory() {
       .post("http://192.168.50.55:8080/inventory-data")
       .then(async (response) => {
         const data = await response.data.data;
-        console.log(data, "test");
+        console.log(data, "backend response");
   
         // Sort the data in descending order by date
         const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -234,9 +257,7 @@ export default function Inventory() {
             period: data.period,
             month: data.month,
             week: data.week,
-            //category: data.category,
             skuDescription: data.skuDescription,
-            //products: data.products,
             skuCode: data.skuCode,
             status: data.status,
             beginningSA: value(data.status, data.beginningSA),
@@ -250,13 +271,20 @@ export default function Inventory() {
             inventoryDaysLevel: value(data.status, data.inventoryDaysLevel),
             noOfDaysOOS: value(data.status, data.noOfDaysOOS),
             remarksOOS: data.remarksOOS,
-            //reasonOOS: data.reasonOOS
+            expiryFields: data.expiryFields, // Ensure expiryFields is included
           };
         });
-        console.log(newData, "testing par");
+  
+        console.log(newData, "mapped data");
         setUserData(newData);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
       });
   }
+  
+  
+  
   
   async function getDate(selectedDate) {
     const data = { selectDate: selectedDate };
