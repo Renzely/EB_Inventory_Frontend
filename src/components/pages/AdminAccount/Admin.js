@@ -35,6 +35,7 @@ import Swal from "sweetalert2";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { type } from "@testing-library/user-event/dist/type";
+import PersonIcon from '@mui/icons-material/Person';
 
 const style = {
   position: "absolute",
@@ -523,7 +524,7 @@ export default function Admin() {
                 color: "#FFFFF",
               }}
             >
-              View
+              <PersonIcon />
             </Button>
           </Stack>
         );
@@ -736,7 +737,7 @@ export default function Admin() {
       <Topbar />
       <div className="container">
         <Sidebar />
-        <div style={{ height: "100%", width: "85%", marginLeft: "100" }}>
+        <div style={{ height: "100%", width: "100%", marginLeft: "100" }}>
           <div style={{ margin: 10 }}>
             <Button
               onClick={handleOpenDialog}

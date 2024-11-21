@@ -122,7 +122,7 @@ export default function Sidebar() {
               </li>
             </NavLink>
 
-            <NavLink
+            {/* <NavLink
               to="/view-outletinputs"
               style={{ textDecoration: "none" }}
               onClick={() => handleItemClick("/view-outlet")}>
@@ -134,7 +134,7 @@ export default function Sidebar() {
                 <StoreIcon className="sidebarIcon" />
                 Outlet Count
               </li>
-            </NavLink>
+            </NavLink> */}
 
             
             <li className="sidebarListItem" onClick={() => handleLogout()}>

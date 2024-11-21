@@ -23,6 +23,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useDemoData } from "@mui/x-data-grid-generator";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { Autocomplete } from "@mui/material";
+import PersonIcon from '@mui/icons-material/Person';
 
 const style = {
   position: "absolute",
@@ -191,12 +192,12 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
       width: 250,
       headerClassName: "bold-header",
     },
-    {
-      field: "remarks",
-      headerName: "REMARKS",
-      width: 150,
-      headerClassName: "bold-header",
-    },
+    // {
+    //   field: "remarks",
+    //   headerName: "REMARKS",
+    //   width: 150,
+    //   headerClassName: "bold-header",
+    // },
     {
       field: "contactNum",
       headerName: "CONTACT NUMBER",
@@ -315,7 +316,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
                 color: "#FFFFF",
               }}
             >
-              View
+             <PersonIcon />
             </Button>
           </Stack>
         );
@@ -378,7 +379,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
       <Topbar />
       <div className="container">
         <Sidebar />
-        <div style={{ height: "100%", width: "85%", marginLeft: "100" }}>
+        <div style={{ height: "100%", width: "100%", marginLeft: "100" }}>
           <DataGrid
             rows={userData}
             columns={columns}
@@ -399,7 +400,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
               toolbar: {
                 showQuickFilter: true,
                 printOptions: { disableToolbarButton: true },
-                csvOptions: { disableToolbarButton: false },
+                csvOptions: { disableToolbarButton: true },
               },
             }}
             loading={!userData.length}
