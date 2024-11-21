@@ -93,7 +93,7 @@ export default function Attendance() {
       disableClickEventBubbling: true,
       renderCell: (params) => {
         return (
-          <Stack>
+          <Stack style={{ marginTop: 0, alignItems: "center" }}>
             <Link
               to="/view-attendance"
               state={{ userEmail: params.row.emailAddress }} // Pass email via state
@@ -114,7 +114,8 @@ export default function Attendance() {
   ];
 
   async function fetchCurrentAttendance(emailAddress, currentDate = new Date()) {
-    const formattedDate = currentDate.toISOString().split('T')[0];
+    // Format date as dd-MM-yyyy
+    const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${currentDate.getFullYear()}`;
   
     try {
       const response = await axios.post(
@@ -139,10 +140,14 @@ export default function Attendance() {
   
       const latestLog = data[data.length - 1];
       const latestLogDate = latestLog.date.split('T')[0]; // Assuming date is in ISO format
+      const latestFormattedDate = latestLogDate
+        .split('-')
+        .reverse()
+        .join('-'); // Convert to dd-MM-yyyy
   
       let accountNameBranchManning = latestLog.accountNameBranchManning || "";
   
-      if (latestLogDate !== formattedDate) {
+      if (latestFormattedDate !== formattedDate) {
         // New day has started, reset attendance and set branch to "No Branch"
         return {
           date: formattedDate,
@@ -163,13 +168,19 @@ export default function Attendance() {
   
       const timeLog = latestLog.timeLogs[latestLog.timeLogs.length - 1];
   
-      const timeIn = timeLog.timeIn ? formatDateTime(timeLog.timeIn) : "No Time In";
-      const timeOut = timeLog.timeOut ? formatDateTime(timeLog.timeOut) : "No Time Out";
+      const timeIn = timeLog.timeIn
+        ? formatDateTime(timeLog.timeIn).time
+        : "No Time In";
+      const timeOut = timeLog.timeOut
+        ? formatDateTime(timeLog.timeOut).time
+        : "No Time Out";
   
       return {
-        date: timeLog.timeIn ? timeLog.timeIn.slice(0, 10) : formattedDate,
-        timeIn: timeIn.time,
-        timeOut: timeOut.time,
+        date: timeLog.timeIn
+          ? timeLog.timeIn.slice(0, 10).split('-').reverse().join('-')
+          : formattedDate,
+        timeIn: timeIn,
+        timeOut: timeOut,
         accountNameBranchManning: accountNameBranchManning
       };
     } catch (error) {
@@ -222,7 +233,7 @@ export default function Attendance() {
       <Topbar />
       <div className="container">
         <Sidebar />
-        <div style={{ height: "100%", width: "85%", marginLeft: "100" }}>
+        <div style={{ height: "100%", width: "100%", marginLeft: "100" }}>
           <DataGrid
             rows={userData}
             columns={columns}
@@ -236,7 +247,7 @@ export default function Attendance() {
               toolbar: {
                 showQuickFilter: true,
                 printOptions: { disableToolbarButton: true },
-                csvOptions: { disableToolbarButton: false },
+                csvOptions: { disableToolbarButton: true },
               },
             }}
             pageSizeOptions={[5, 10, 20, 50, 100]}

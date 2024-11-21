@@ -61,12 +61,11 @@ export default function OUTLET() {
 
       inventoryData.forEach((item) => {
         const branch = item.accountNameBranchManning;
-        if (counts[branch]) {
-          counts[branch] += 1;
-        } else {
-          counts[branch] = 1;
+        if (branch) {
+          counts[branch] = (counts[branch] || 0) + 1;
         }
       });
+      
 
       setInventoryCount(counts);
     } catch (error) {
@@ -76,33 +75,28 @@ export default function OUTLET() {
 
   const fetchUsersByBranch = async (branch) => {
     try {
-      // Fetch users for the selected branch, regardless of inventory
       const response = await axios.post(
         "http://192.168.50.55:8080/get-users-by-branch",
         { branch }
       );
       const users = response.data.users;
-
-      // Filter users to ensure uniqueness by name and branch
-      const filteredUsers = users.reduce((acc, currentUser) => {
-        const userExists = acc.find(
-          (user) =>
-            user.name === currentUser.name && user.branch === currentUser.branch
-        );
-        if (!userExists) {
-          acc.push(currentUser);
-        }
-        return acc;
-      }, []);
-
-      // Set the filtered users to display in the modal
-      setUsers(filteredUsers);
+  
+      // Map users to include branch explicitly
+      const userBranchMap = users.map((user) => ({
+        id: user._id,
+        name: user.name,
+        branch: user.accountNameBranchManning // Include branch explicitly
+      }));
+  
+      // Set users for the modal
+      setUsers(userBranchMap);
       setSelectedBranch(branch);
       setOpen(true); // Open the modal
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
+  
 
   React.useEffect(() => {
     fetchInventoryCount(); // Fetch data when the component mounts
@@ -157,7 +151,7 @@ export default function OUTLET() {
       <Topbar />
       <div className="container">
         <Sidebar />
-        <div style={{ height: "100%", width: "85%", marginLeft: "100" }}>
+        <div style={{ height: "100%", width: "100%", marginLeft: "100" }}>
           <Stack
             direction={{ xs: "column", md: "row", sm: "row" }}
             spacing={{ xs: 1, sm: 2, md: 4 }}
@@ -188,29 +182,32 @@ export default function OUTLET() {
 
           {/* Modal to display users */}
           <Modal open={open} onClose={() => setOpen(false)}>
-            <Box
-              sx={{
-                padding: 4,
-                backgroundColor: "white",
-                margin: "auto",
-                width: "50%",
-              }}
-            >
-              <Typography variant="h6">Merchandiser for {selectedBranch}</Typography>
-              <ul>
-                {users.length > 0 ? (
-                  users.map((user) => (
-                    <li key={user._id}>
-                      {user.name}
-                    </li>
-                  ))
-                ) : (
-                  <Typography>No users available for this branch</Typography>
-                )}
-              </ul>
-              <Button onClick={() => setOpen(false)}>Close</Button>
-            </Box>
-          </Modal>
+  <Box
+    sx={{
+      padding: 4,
+      backgroundColor: "white",
+      margin: "auto",
+      width: "50%"
+    }}
+  >
+    <Typography variant="h6">
+      Merchandisers for Branch: {selectedBranch}
+    </Typography>
+    <ul>
+      {users.length > 0 ? (
+        users.map((user) => (
+          <li key={user.id}>
+            {user.name} - Branch: {user.branch}
+          </li>
+        ))
+      ) : (
+        <Typography>No users available for this branch</Typography>
+      )}
+    </ul>
+    <Button onClick={() => setOpen(false)}>Close</Button>
+  </Box>
+</Modal>
+
         </div>
       </div>
     </div>
