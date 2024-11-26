@@ -929,7 +929,7 @@ export default function OUTLET() {
     if (statusCategory && selectedStatus) {
       try {
         const response = await fetch(
-          `http://192.168.50.55:8080/get-skus-by-status?branch=${encodeURIComponent(
+          `https://eb-inventory-backend.onrender.com/get-skus-by-status?branch=${encodeURIComponent(
             selectedBranch
           )}&statusCategory=${encodeURIComponent(
             statusCategory
@@ -1095,7 +1095,7 @@ export default function OUTLET() {
 
     try {
       const response = await fetch(
-        `http://192.168.50.55:8080/get-skus?accountNameBranchManning=${encodeURIComponent(
+        `https://eb-inventory-backend.onrender.com/get-skus?accountNameBranchManning=${encodeURIComponent(
           branch
         )}`
       );
@@ -1131,7 +1131,7 @@ export default function OUTLET() {
       }));
 
       const response = await fetch(
-        "http://192.168.50.55:8080/save-branch-sku",
+        "https://eb-inventory-backend.onrender.com/save-branch-sku",
         {
           method: "POST",
           body: JSON.stringify({
@@ -1190,7 +1190,7 @@ export default function OUTLET() {
     }
 
     try {
-      const response = await fetch("http://192.168.50.55:8080/disable-sku", {
+      const response = await fetch("https://eb-inventory-backend.onrender.com/disable-sku", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1223,7 +1223,7 @@ export default function OUTLET() {
     }
 
     try {
-      const response = await fetch("http://192.168.50.55:8080/enable-sku", {
+      const response = await fetch("https://eb-inventory-backend.onrender.com/enable-sku", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1258,7 +1258,7 @@ export default function OUTLET() {
     }
 
     try {
-      const response = await fetch("http://192.168.50.55:8080/delisted-sku", {
+      const response = await fetch("https://eb-inventory-backend.onrender.com/delisted-sku", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1293,7 +1293,7 @@ export default function OUTLET() {
 
     try {
       const response = await fetch(
-        "http://192.168.50.55:8080/update-sku-status",
+        "https://eb-inventory-backend.onrender.com/update-sku-status",
         {
           method: "POST",
           headers: {

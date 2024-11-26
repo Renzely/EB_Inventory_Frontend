@@ -64,7 +64,7 @@ export default function ViewAttendance() {
     try {
       // Fetch all user data
       const userResponse = await axios.post(
-        "http://192.168.50.55:8080/get-all-user",
+        "https://eb-inventory-backend.onrender.com/get-all-user",
         {}
       );
       const users = userResponse.data.data;
@@ -84,7 +84,7 @@ export default function ViewAttendance() {
 
       // Fetch attendance data
       const attendanceResponse = await axios.post(
-        "http://192.168.50.55:8080/get-attendance",
+        "https://eb-inventory-backend.onrender.com/get-attendance",
         { userEmail: emailAddress }
       );
       let data = attendanceResponse.data.data;
@@ -356,7 +356,7 @@ formattedData.sort((a, b) => {
     try {
       // Fetch user data
       const userResponse = await axios.post(
-        "http://192.168.50.55:8080/get-all-user",
+        "https://eb-inventory-backend.onrender.com/get-all-user",
         {}
       );
       const users = userResponse.data.data;
@@ -374,7 +374,7 @@ formattedData.sort((a, b) => {
 
       // Fetch attendance data
       const response = await axios.post(
-        "http://192.168.50.55:8080/get-attendance",
+        "https://eb-inventory-backend.onrender.com/get-attendance",
         {
           userEmail: userEmail,
         }

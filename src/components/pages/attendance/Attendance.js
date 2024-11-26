@@ -119,7 +119,7 @@ export default function Attendance() {
   
     try {
       const response = await axios.post(
-        "http://192.168.50.55:8080/get-attendance",
+        "https://eb-inventory-backend.onrender.com/get-attendance",
         { userEmail: emailAddress, date: formattedDate }
       );
       const data = response.data.data;
@@ -196,33 +196,63 @@ export default function Attendance() {
   
   
 
-  // Fetch users and their current attendance
   async function getUser() {
-    await axios.post("http://192.168.50.55:8080/get-all-user", body)
-      .then(async (response) => {
-        const data = await response.data.data;
+    try {
+      // Fetch the users' data
+      const response = await axios.post("https://eb-inventory-backend.onrender.com/get-all-user", body);
+      const data = await response.data.data;
   
-        // Fetch attendance data for each user
-        const newData = await Promise.all(
-          data.map(async (user, key) => {
-            const attendance = await fetchCurrentAttendance(user.emailAddress);
-            return {
-              count: key + 1,
-              fullName: `${user.firstName} ${user.lastName}`, 
-              firstName: user.firstName,
-              middleName: user.middleName || "null",
-              lastName: user.lastName,
-              emailAddress: user.emailAddress,
-              outlet: attendance.accountNameBranchManning || "No Branch", // Display the attendance branch
-              date: attendance.date,
-              timeIn: attendance.timeIn,
-              timeOut: attendance.timeOut,
-            };
-          })
-        );
-        setUserData(newData);
-      });
+      // Retrieve the logged-in admin's accountNameBranchManning from localStorage
+      const loggedInBranch = localStorage.getItem("accountNameBranchManning");
+  
+      if (!loggedInBranch) {
+        console.error("No branch information found for the logged-in admin.");
+        return;
+      }
+  
+      // Split the loggedInBranch string into an array for comparison
+      const loggedInBranches = loggedInBranch.split(',').map(branch => branch.trim());
+  
+      // Fetch attendance data for each user and filter based on branches
+      const newData = await Promise.all(
+        data.map(async (user, key) => {
+          // Fetch attendance for each user
+          const attendance = await fetchCurrentAttendance(user.emailAddress);
+  
+          // If the user's attendance branch does not match the logged-in branches, exclude them
+          const isBranchMatching = loggedInBranches.some(branch => 
+            attendance.accountNameBranchManning.includes(branch)
+          );
+  
+          if (!isBranchMatching) {
+            return null; // Exclude this user by returning null
+          }
+  
+          return {
+            count: key + 1,
+            fullName: `${user.firstName} ${user.lastName}`,
+            firstName: user.firstName,
+            middleName: user.middleName || "null",
+            lastName: user.lastName,
+            emailAddress: user.emailAddress,
+            outlet: attendance.accountNameBranchManning, // Use the filtered branch name
+            date: attendance.date,
+            timeIn: attendance.timeIn,
+            timeOut: attendance.timeOut,
+          };
+        })
+      );
+  
+      // Filter out null values (users who were excluded due to branch mismatch)
+      const filteredData = newData.filter(user => user !== null);
+  
+      // Set the filtered data to state
+      setUserData(filteredData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   }
+  
   
   React.useEffect(() => {
     getUser();

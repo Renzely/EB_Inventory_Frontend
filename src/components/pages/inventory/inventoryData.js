@@ -77,7 +77,7 @@ export default function Inventory() {
     },
     {
       field: "period",
-      headerName: "PERIOD",
+      headerName: "WEEKS COVERED",
       width: 200,
       headerClassName: "bold-header",
     },
@@ -212,62 +212,79 @@ export default function Inventory() {
   ];
 
   async function getUser() {
-    await axios
-      .post("http://192.168.50.55:8080/inventory-data")
-      .then(async (response) => {
-        const data = await response.data.data;
-        console.log(data, "backend response");
-
-        const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const reversedData = sortedData.reverse(); // Reverse the order
-
-        const newData = reversedData.map((data, key) => {
-          const value = (status, defaultValue) => {
-            if (status === "Delisted") return "Delisted";
-            if (status === "Not Carried") return "NC";
-            return defaultValue || 0;
-          };
-
-          return {
-            count: key + 1,
-            date: data.date,
-            inputId: data.inputId,
-            name: data.name,
-            UserEmail: data.userEmail,
-            accountNameBranchManning: data.accountNameBranchManning,
-            period: data.period,
-            month: data.month,
-            week: data.week,
-            skuDescription: data.skuDescription,
-            skuCode: data.skuCode,
-            status: data.status,
-            beginningSA: value(data.status, data.beginningSA),
-            beginningWA: value(data.status, data.beginningWA),
-            beginning: value(data.status, data.beginning),
-            delivery: value(data.status, data.delivery),
-            endingSA: value(data.status, data.endingSA),
-            endingWA: value(data.status, data.endingWA),
-            ending: value(data.status, data.ending),
-            offtake: value(data.status, data.offtake),
-            inventoryDaysLevel: value(data.status, data.inventoryDaysLevel),
-            noOfDaysOOS: value(data.status, data.noOfDaysOOS),
-            remarksOOS: data.remarksOOS,
-            expiryFields: data.expiryFields, // Ensure expiryFields is included
-          };
-        });
-
-        console.log(newData, "mapped data");
-        setUserData(newData);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
+    try {
+      // Retrieve the logged-in admin's accountNameBranchManning from localStorage
+      const loggedInBranch = localStorage.getItem("accountNameBranchManning");
+  
+      console.log("Logged in branch:", loggedInBranch);  // Debugging line
+  
+      if (!loggedInBranch) {
+        console.error("No branch information found for the logged-in admin.");
+        return;
+      }
+  
+      // Fetch the inventory data
+      const response = await axios.post("https://eb-inventory-backend.onrender.com/inventory-data");
+  
+      const data = response.data.data;
+      console.log(data, "backend response");
+  
+      // Filter the data based on the logged-in admin's accountNameBranchManning
+      const filteredData = data.filter(
+        (item) => loggedInBranch.split(',').includes(item.accountNameBranchManning)
+      );
+  
+      // Sort the filtered data by date in descending order
+      const sortedData = filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+      // Map the filtered and sorted data
+      const newData = sortedData.map((data, key) => {
+        const value = (status, defaultValue) => {
+          if (status === "Delisted") return "Delisted";
+          if (status === "Not Carried") return "NC";
+          return defaultValue || 0;
+        };
+  
+        return {
+          count: key + 1,
+          date: data.date,
+          inputId: data.inputId,
+          name: data.name,
+          UserEmail: data.userEmail,
+          accountNameBranchManning: data.accountNameBranchManning,
+          period: data.period,
+          month: data.month,
+          week: data.week,
+          skuDescription: data.skuDescription,
+          skuCode: data.skuCode,
+          status: data.status,
+          beginningSA: value(data.status, data.beginningSA),
+          beginningWA: value(data.status, data.beginningWA),
+          beginning: value(data.status, data.beginning),
+          delivery: value(data.status, data.delivery),
+          endingSA: value(data.status, data.endingSA),
+          endingWA: value(data.status, data.endingWA),
+          ending: value(data.status, data.ending),
+          offtake: value(data.status, data.offtake),
+          inventoryDaysLevel: value(data.status, data.inventoryDaysLevel),
+          noOfDaysOOS: value(data.status, data.noOfDaysOOS),
+          remarksOOS: data.remarksOOS,
+          expiryFields: data.expiryFields, // Ensure expiryFields is included
+        };
       });
+  
+      console.log(newData, "mapped data");
+      setUserData(newData); // Set the filtered data for rendering
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }
-
+  
+  
   async function getDate(selectedDate) {
     const data = { selectDate: selectedDate };
     await axios
-      .post("http://192.168.50.55:8080/filter-date", data)
+      .post("https://eb-inventory-backend.onrender.com/filter-date", data)
       .then(async (response) => {
         const data = await response.data.data;
         console.log(data, "test");
@@ -330,22 +347,22 @@ export default function Inventory() {
     }
 
     try {
-        const response = await axios.post('http://192.168.50.55:8080/export-inventory-data', {
+        const response = await axios.post('https://eb-inventory-backend.onrender.com/export-inventory-data', {
             start: bDate,
             end: eDate
         });
 
         const headers = [
             "#",
-            "Inventory ID",
+            "Inventory Number",
             "Date",
             "Fullname",
             "Outlet",
-            "Period",
+            "Weeks Covered",
             "Month",
             "Week",
             "SKU",
-            "SKU CODE",
+            "4-Pack Barcode",
             "Status",
             "BeginningSA",
             "BeginningWA",
@@ -453,10 +470,10 @@ export default function Inventory() {
 
   return (
     <div className="attendance">
-      <Topbar />
+      <Topbar />  
       <div className="container">
         <Sidebar />
-        <div style={{ height: "100%", width: "85%", marginLeft: "100" }}>
+        <div style={{ height: "100%", width: "85%",}}>
           <Stack 
             direction={{ xs: 'column', md: 'row',sm: 'row' }}
             spacing={{ xs: 1, sm: 2, md: 4 }}

@@ -53,7 +53,7 @@ export default function OUTLET() {
 
     try {
       const response = await axios.post(
-        "http://192.168.50.55:8080/filter-date",
+        "https://eb-inventory-backend.onrender.com/filter-date",
         data
       );
       const inventoryData = response.data.data;
@@ -76,7 +76,7 @@ export default function OUTLET() {
   const fetchUsersByBranch = async (branch) => {
     try {
       const response = await axios.post(
-        "http://192.168.50.55:8080/get-users-by-branch",
+        "https://eb-inventory-backend.onrender.com/get-users-by-branch",
         { branch }
       );
       const users = response.data.users;

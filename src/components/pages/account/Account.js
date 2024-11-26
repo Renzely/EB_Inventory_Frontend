@@ -129,7 +129,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
     try {
       // Update the user's branches with the selected branches
       const response = await axios.put(
-        "http://192.168.50.55:8080/update-user-branch",
+        "https://eb-inventory-backend.onrender.com/update-user-branch",
         {
           emailAddress: modalEmail,
           branches: selectedBranches,
@@ -325,38 +325,65 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
   ];
 
   async function getUser() {
-    await axios
-      .post(
-        "http://192.168.50.55:8080/get-all-user",
-        requestBody
-      )
-      .then(async (response) => {
-        const data = await response.data.data;
-
-        const newData = data.map((data, key) => {
-          return {
-            count: key + 1,
-            remarks: data.remarks,
-            firstName: data.firstName,
-            middleName: data.middleName ? data.middleName : "Null",
-            lastName: data.lastName,
-            username: data.username,
-            Branch: data.accountNameBranchManning,
-            emailAddress: data.emailAddress,
-            contactNum: data.contactNum,
-            isActive: data.isActivate,
-          };
-        });
-        console.log(newData, "testing par");
-        setUserData(newData);
+    try {
+      // Retrieve the logged-in admin's accountNameBranchManning from localStorage
+      const loggedInBranch = localStorage.getItem("accountNameBranchManning");
+  
+      console.log("Logged in branch:", loggedInBranch);  // Debugging line
+  
+      if (!loggedInBranch) {
+        console.error("No branch information found for the logged-in admin.");
+        return;
+      }
+  
+      // Split the loggedInBranch string into an array for comparison
+      const loggedInBranches = loggedInBranch.split(',').map(branch => branch.trim());  // Trimming whitespace
+  
+      // Send request to get all user data
+      const response = await axios.post("https://eb-inventory-backend.onrender.com/get-all-user", requestBody);
+  
+      const data = response.data.data;
+  
+      console.log("User data:", data);  // Debugging line
+  
+      // Filter the data based on the logged-in admin's accountNameBranchManning
+      const filteredData = data.filter((item) => {
+        console.log("Checking branch for user:", item.accountNameBranchManning);  // Debugging line
+        // Check if any branch in loggedInBranches matches any branch in item.accountNameBranchManning
+        return loggedInBranches.some(branch => item.accountNameBranchManning.includes(branch));
       });
+  
+      console.log(filteredData, "filtered user data");
+  
+      // Map the filtered data
+      const newData = filteredData.map((data, key) => {
+        return {
+          count: key + 1,
+          remarks: data.remarks,
+          firstName: data.firstName,
+          middleName: data.middleName ? data.middleName : "Null",
+          lastName: data.lastName,
+          username: data.username,
+          Branch: data.accountNameBranchManning,
+          emailAddress: data.emailAddress,
+          contactNum: data.contactNum,
+          isActive: data.isActivate,
+        };
+      });
+  
+      console.log(newData, "filtered and mapped user data");
+      setUserData(newData);  // Set the filtered data for rendering
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   }
+  
 
   async function setStatus() {
     console.log("check body", requestBody);
     await axios
       .put(
-        "http://192.168.50.55:8080/update-status",
+        "https://eb-inventory-backend.onrender.com/update-status",
         requestBody
       )
       .then(async (response) => {

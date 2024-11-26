@@ -80,14 +80,14 @@ export default function RTV() {
     },
     {
       field: "item",
-      headerName: "SKU",
+      headerName: "MATERIAL DESCRIPTION",
       width: 220,
       headerClassName: 'bold-header'
     },
     {
       field: "expiryDate",
       headerName: "EXPIRY DATE",
-      width: 200,
+      width: 150,
       headerClassName: 'bold-header'
     },
     {
@@ -105,7 +105,7 @@ export default function RTV() {
     {
       field: "total",
       headerName: "TOTAL",
-      width: 180,
+      width: 150,
       headerClassName: 'bold-header'
     },
     {
@@ -141,46 +141,63 @@ export default function RTV() {
 
 
   async function getUser() {
-    await axios
-        .post("http://192.168.50.55:8080/retrieve-RTV-data")
-        .then(async (response) => {
-            const data = response.data?.data || [];
-            console.log(data, "test");
+    try {
+        // Retrieve the logged-in admin's accountNameBranchManning from localStorage
+        const loggedInBranch = localStorage.getItem("accountNameBranchManning");
 
-            // Sort the data in descending order by date, only if data is not empty
-            const sortedData = data.length ? data.sort((a, b) => new Date(b.date) - new Date(a.date)) : [];
+        console.log("Logged in branch:", loggedInBranch);  // Debugging line
 
-            const newData = sortedData.map((data, key) => {
-                return {
-                    count: key + 1,
-                    date: data.date,
-                    inputId: data.inputId,
-                    merchandiserName: data.merchandiserName,
-                    UserEmail: data.userEmail,
-                    outlet: data.outlet,
-                    item: data.item,
-                    amount: data.amount,
-                    quantity: data.quantity,
-                    total: data.total,
-                    remarks: data.remarks,
-                    reason: data.reason,
-                    expiryDate: data.expiryDate,
-                };
-            });
-            console.log(newData, "testing par");
-            setUserData(newData);
-        })
-        .catch((error) => {
-            console.error("Error fetching RTV data:", error);
-            setUserData([]); // Set to an empty array if there's an error
+        if (!loggedInBranch) {
+            console.error("No branch information found for the logged-in admin.");
+            return;
+        }
+
+        // Fetch RTV data
+        const response = await axios.post("https://eb-inventory-backend.onrender.com/retrieve-RTV-data");
+
+        const data = response.data?.data || [];
+        console.log(data, "test");
+
+        // Filter the data based on the logged-in admin's accountNameBranchManning
+        const filteredData = data.filter(
+            (item) => loggedInBranch.split(',').includes(item.outlet)
+        );
+
+        // Sort the filtered data in descending order by date
+        const sortedData = filteredData.length ? filteredData.sort((a, b) => new Date(b.date) - new Date(a.date)) : [];
+
+        // Map the filtered and sorted data
+        const newData = sortedData.map((data, key) => {
+            return {
+                count: key + 1,
+                date: data.date,
+                inputId: data.inputId,
+                merchandiserName: data.merchandiserName,
+                UserEmail: data.userEmail,
+                outlet: data.outlet,
+                item: data.item,
+                amount: data.amount,
+                quantity: data.quantity,
+                total: data.total,
+                remarks: data.remarks,
+                reason: data.reason,
+                expiryDate: data.expiryDate,
+            };
         });
+
+        console.log(newData, "mapped RTV data");
+        setUserData(newData); // Set the filtered and mapped RTV data for rendering
+    } catch (error) {
+        console.error("Error fetching RTV data:", error);
+        setUserData([]); // Set to an empty array if there's an error
+    }
 }
 
 
 async function getDateRTV(selectedDate) {
   const data = { selectDate: selectedDate };
   await axios
-      .post("http://192.168.50.55:8080/filter-RTV-data", data)
+      .post("https://eb-inventory-backend.onrender.com/filter-RTV-data", data)
       .then(async (response) => {
           const data = await response.data.data;
           console.log(data, "test");
@@ -222,7 +239,7 @@ const getExportData = async () => {
   }
 
   try {
-      const response = await axios.post('http://192.168.50.55:8080/export-RTV-data', {
+      const response = await axios.post('https://eb-inventory-backend.onrender.com/export-RTV-data', {
           start: bDate,
           end: eDate
       });
@@ -230,10 +247,10 @@ const getExportData = async () => {
       const headers = [
           "#",
           "Date", 
-          "RTV DOC",
+          "RTV Number",
           "Merchandiser Name",
           "Outlet",
-          "SKU",
+          "Material Description",
           "Amount",
           "Quantity",
           "Total",
@@ -264,9 +281,9 @@ const getExportData = async () => {
       XLSX.utils.sheet_add_aoa(ws, [headers], { origin: "A1" });
       XLSX.utils.sheet_add_json(ws, newData, { origin: "A2", skipHeader: true });
 
-      // Calculate dynamic column widths for SKU and Inventory Days Level
+      // Calculate dynamic column widths for MATERIAL DESCRIPTION and Inventory Days Level
       const colWidths = headers.map((header, index) => {
-          if (header === "SKU" || header === "Inventory Days Level") {
+          if (header === "MATERIAL DESCRIPTION" || header === "Inventory Days Level") {
               const maxLength = Math.max(
                   header.length, // Length of the header
                   ...newData.map(row => (row[Object.keys(row)[index]] || "").toString().length) // Length of data in the column
@@ -327,7 +344,7 @@ const getExportData = async () => {
          <div className="container">
          <Sidebar/>
          
-      <div style={{ height: "100%", width: "100%", marginLeft: "100" }}>
+      <div style={{ height: "100%",  width: "85%", marginLeft: "100"  }}>
 
       <Stack 
             direction={{ xs: 'column', md: 'row',sm: 'row' }}
