@@ -143,7 +143,7 @@ export default function Admin() {
   const handleBranchSave = async (email) => {
     try {
       const response = await axios.put(
-        "http://192.168.50.55:8080/update-user-branch",
+        "https://eb-inventory-backend.onrender.com/update-user-branch",
         {
           emailAddress: email, // Use the passed email directly
           branches: selectedBranches,
@@ -356,7 +356,7 @@ export default function Admin() {
 
       // Send the emails to the backend
       const response = await axios.post(
-        "http://192.168.50.55:8080/update-coor-details",
+        "https://eb-inventory-backend.onrender.com/update-coor-details",
         {
           emails: selectedEmails,
         }
@@ -535,7 +535,7 @@ export default function Admin() {
   async function getUser() {
     try {
       const response = await axios.post(
-        "http://192.168.50.55:8080/get-all-user"
+        "https://eb-inventory-backend.onrender.com/get-all-user"
       );
       const data = response.data.data;
 
@@ -554,7 +554,7 @@ export default function Admin() {
   async function getMerchandiserData() {
     try {
       const response = await axios.post(
-        "http://192.168.50.55:8080/get-all-merchandiser"
+        "https://eb-inventory-backend.onrender.com/get-all-merchandiser"
       );
       const data = response.data.data;
 
@@ -579,7 +579,7 @@ export default function Admin() {
 
   async function getUser() {
     await axios
-      .post("http://192.168.50.55:8080/get-admin-user", requestBody)
+      .post("https://eb-inventory-backend.onrender.com/get-admin-user", requestBody)
       .then(async (response) => {
         const data = await response.data.data;
 
@@ -604,7 +604,7 @@ export default function Admin() {
 
   async function setStatus() {
     await axios
-      .put("http://192.168.50.55:8080/update-status", requestBody)
+      .put("https://eb-inventory-backend.onrender.com/update-status", requestBody)
       .then(async (response) => {
         const data = await response.data.data;
 
@@ -613,117 +613,89 @@ export default function Admin() {
   }
 
   async function sendOtp() {
-    if (adminSelectedRole === "") {
+    if (!adminSelectedRole || !adminSelectedBranch.length) {
       Swal.fire({
         title: "Unable to proceed",
-        text: "Please select Role!",
+        text: "Please select Role and Branch!",
         icon: "error",
       });
       return;
     }
-
-    if (adminSelectedBranch.length === 0) {
-      Swal.fire({
-        title: "Unable to proceed",
-        text: "Please select Branch!",
-        icon: "error",
-      });
-      return;
-    }
-
-    await axios
-      .post("http://192.168.50.55:8080/send-otp-register", {
+  
+    try {
+      const response = await axios.post("https://eb-inventory-backend.onrender.com/send-otp-register", {
         email: adminEmail,
-      })
-      .then(async (response) => {
-        const data = await response.data;
-        console.log(response.data);
-        if (data.status === 200) {
-          setOtpCode(data.code);
-          setOpenDialog(true);
-        } else {
-          Swal.fire({
-            title: "Unable to proceed",
-            text: "Sending OTP failed!",
-            icon: "error",
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.response) {
-          Swal.fire({
-            title: "Unable to proceed",
-            text: error.response.data,
-            icon: "error",
-          });
-          return;
-        } else if (error.request) {
-          Swal.fire({
-            title: "Unable to proceed",
-            text: error.request,
-            icon: "error",
-          });
-          return;
-        } else {
-          Swal.fire({
-            title: "Unable to proceed",
-            text: error.message,
-            icon: "error",
-          });
-          return;
-        }
       });
+  
+      if (response.data.status === 200) {
+        setOtpCode(response.data.code);
+        setOpenDialog(true);
+        Swal.fire({
+          title: "OTP Sent",
+          text: "An OTP has been sent to your email.",
+          icon: "success",
+        });
+      } else {
+        throw new Error(`Failed to send OTP: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      Swal.fire({
+        title: "Error",
+        text: error.message || "Failed to send OTP. Please try again.",
+        icon: "error",
+      });
+    }
   }
 
   async function confirmOtp() {
-    if (otpCode === inputOtpCode) {
-      const userDetails = {
-        roleAccount: adminSelectedRole,
-        accountNameBranchManning: adminSelectedBranch,
-        firstName: adminFirstName,
-        middleName: adminMiddleName,
-        lastName: adminLastName,
-        contactNum: adminPhone,
-        emailAddress: adminEmail,
-        password: adminPassword,
-      };
-
-      axios
-        .post("http://192.168.50.55:8080/register-user-admin", userDetails)
-        .then(async (response) => {
-          const data = response.data;
-
-          if (data.status === 200) {
-            Swal.fire({
-              title: "Success",
-              text: "User created successfully!",
-              icon: "success",
-              confirmButtonColor: "#3085d6",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                return window.location.reload();
-              } else {
-                return window.location.reload();
-              }
-            });
-          } else {
-            Swal.fire({
-              title: "Unable to proceed",
-              text: "Saving user Error!",
-              icon: "error",
-            });
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    } else if (otpCode !== inputOtpCode) {
+    if (inputOtpCode !== otpCode) {
       setInputOtpCodeError("OTP code does not match.");
-    } else if (inputOtpCode.length < 4) {
-      setInputOtpCodeError("Input must be 4 digits.");
+      return;
     }
-    return;
-  }
+  
+    if (inputOtpCode.length < 4) {
+      setInputOtpCodeError("Input must be 4 digits.");
+      return;
+    }
+  
+    const userDetails = {
+      roleAccount: adminSelectedRole,
+      accountNameBranchManning: adminSelectedBranch.join(", "),
+      firstName: adminFirstName,
+      middleName: adminMiddleName,
+      lastName: adminLastName,
+      contactNum: adminPhone,
+      emailAddress: adminEmail,
+      password: adminPassword,
+    };
+  
+    try {
+      const response = await axios.post("https://eb-inventory-backend.onrender.com/register-user-admin", userDetails);
+    
+      if (response.data.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: response.data.message,
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      } else {
+        throw new Error(response.data.message || "Unexpected error occurred.");
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      Swal.fire({
+        title: "Error",
+        text: error.message || "Failed to create user. Please try again.",
+        icon: "error",
+      });
+    }
+  }    
 
   React.useEffect(() => {
     getUser();

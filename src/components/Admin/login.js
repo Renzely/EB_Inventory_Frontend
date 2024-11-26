@@ -45,7 +45,7 @@ export default function Login() {
     }
 
     try {
-      const response = await axios.post('http://192.168.50.55:8080/login-admin', body);
+      const response = await axios.post('https://eb-inventory-backend.onrender.com/login-admin', body);
       const data = await response.data;
 
       if (data.status === 200) {
@@ -55,14 +55,21 @@ export default function Login() {
           confirmButtonColor: "#3085d6",
         }).then((result) => {
           if (result.isConfirmed) {
+            // Log the accountNameBranchManning before saving
+            console.log('Branch Manning:', data.data.accountNameBranchManning);
+      
             localStorage.setItem('isLoggedIn', "admin");
             localStorage.setItem('firstName', data.data.firstName); // Store firstName
             localStorage.setItem('lastName', data.data.lastName);   // Store lastName
             localStorage.setItem('roleAccount', data.data.roleAccount); // Store roleAccount
+            localStorage.setItem('accountNameBranchManning', data.data.accountNameBranchManning); // Store branch info
+      
+            // Redirect to the next page
             window.location.href = '/view-accounts';
           }
         });
-      } else if (data.status === 401) {
+      }
+       else if (data.status === 401) {
         Swal.fire({
           title: "Login Failed!",
           text: data.data,
