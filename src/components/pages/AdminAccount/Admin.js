@@ -211,7 +211,8 @@ export default function Admin() {
 "S&R CABANATUAN",
 "S&R CALASIAO",
 "S&R CDO",
-"S&R DAVAO"
+"S&R DAVAO",
+"Branch"
 
   ];
 
@@ -833,7 +834,7 @@ export default function Admin() {
       <p>Full Details :</p>
 
       <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-        <span className="detailTitle">Account Branch Name:</span>{" "}
+        <span className="detailTitle">OUTLETS:</span>{" "}
         <span className="detailDescription">
           {Array.isArray(adminViewBranch) 
             ? adminViewBranch.join(", ") // Display branches in text
@@ -854,17 +855,33 @@ export default function Admin() {
           <TextField
             {...params}
             variant="outlined"
-            label="Select Branch"
-            placeholder="Select Branch"
+            label="Select Outlet"
+            placeholder="Select Outlet"
           />
         )}
       />
+
+      {/* Buttons for Select All and Remove All */}
+      <Stack direction="row" spacing={2}>
+        <Button
+          onClick={() => setSelectedBranches(branches)} // Select all branches
+          variant="outlined"
+        >
+          Select All
+        </Button>
+        <Button
+          onClick={() => setSelectedBranches([])} // Clear all selections
+          variant="outlined"
+        >
+          Remove All
+        </Button>
+      </Stack>
 
       <Button 
         onClick={() => handleBranchSave(adminViewEmail)} // Call save function
         variant="contained"
       >
-        Save Branch Changes
+        Save Outlet Changes
       </Button>
 
       <TextField

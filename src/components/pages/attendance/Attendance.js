@@ -200,9 +200,9 @@ export default function Attendance() {
     try {
       // Fetch the users' data
       const response = await axios.post("https://eb-inventory-backend.onrender.com/get-all-user", body);
-      const data = await response.data.data;
+      const data = response.data.data;
   
-      // Retrieve the logged-in admin's accountNameBranchManning from localStorage
+      // Retrieve the logged-in admin's branches from localStorage
       const loggedInBranch = localStorage.getItem("accountNameBranchManning");
   
       if (!loggedInBranch) {
@@ -210,24 +210,35 @@ export default function Attendance() {
         return;
       }
   
-      // Split the loggedInBranch string into an array for comparison
+      // Split the logged-in branches string into an array for comparison
       const loggedInBranches = loggedInBranch.split(',').map(branch => branch.trim());
   
-      // Fetch attendance data for each user and filter based on branches
-      const newData = await Promise.all(
+      // Process users
+      const filteredData = await Promise.all(
         data.map(async (user, key) => {
           // Fetch attendance for each user
-          const attendance = await fetchCurrentAttendance(user.emailAddress);
+          const attendance = await fetchCurrentAttendance(user.emailAddress).catch(() => null);
   
-          // If the user's attendance branch does not match the logged-in branches, exclude them
-          const isBranchMatching = loggedInBranches.some(branch => 
-            attendance.accountNameBranchManning.includes(branch)
-          );
+          // Determine the displayed branch
+          let displayedBranch = "No Branch";
   
-          if (!isBranchMatching) {
+          if (attendance && attendance.timeIn) {
+            // Check if attendance branch matches admin's branches
+            const isBranchMatching = loggedInBranches.some(branch =>
+              attendance.accountNameBranchManning.includes(branch)
+            );
+  
+            if (isBranchMatching) {
+              displayedBranch = attendance.accountNameBranchManning; // Use attendance branch if it matches
+            }
+          }
+  
+          // Exclude users whose branches do not match, even if they have attendance
+          if (displayedBranch === "No Branch" && !loggedInBranches.some(branch => user.accountNameBranchManning.includes(branch))) {
             return null; // Exclude this user by returning null
           }
   
+          // Include user data with attendance or placeholders
           return {
             count: key + 1,
             fullName: `${user.firstName} ${user.lastName}`,
@@ -235,23 +246,25 @@ export default function Attendance() {
             middleName: user.middleName || "null",
             lastName: user.lastName,
             emailAddress: user.emailAddress,
-            outlet: attendance.accountNameBranchManning, // Use the filtered branch name
-            date: attendance.date,
-            timeIn: attendance.timeIn,
-            timeOut: attendance.timeOut,
+            outlet: displayedBranch, // Show branch based on attendance or "No Branch"
+            date: attendance?.date || "No Date", // Placeholder if no date is available
+            timeIn: attendance?.timeIn || "No Time In", // Placeholder if no timeIn
+            timeOut: attendance?.timeOut || "No Time Out", // Placeholder if no timeOut
           };
         })
       );
   
-      // Filter out null values (users who were excluded due to branch mismatch)
-      const filteredData = newData.filter(user => user !== null);
+      // Remove null values (excluded users)
+      const validUsers = filteredData.filter(user => user !== null);
   
       // Set the filtered data to state
-      setUserData(filteredData);
+      setUserData(validUsers);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   }
+  
+  
   
   
   React.useEffect(() => {
