@@ -9,6 +9,8 @@ import Box from "@mui/material/Box";
 import { Link } from "react-router-dom";
 import Topbar from "../../topbar/Topbar";
 import Sidebar from "../../sidebar/Sidebar";
+import { format } from "date-fns";
+
 
 
 const style = {
@@ -24,24 +26,31 @@ const style = {
 };
 
 const formatDateTime = (dateTime, isTimeIn = false) => {
-  if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out"; // Handle null dateTime for timeIn and timeOut
-  
-  const dateObj = new Date(dateTime);  // This will parse the UTC time and convert it to local time
-  
-  // Format the date as MM-DD-YYYY
-  const formattedDate = `${dateObj.getMonth() + 1}-${dateObj.getDate()}-${dateObj.getFullYear()}`;
-  
-  // Format the time as HH:mm (24-hour format)
-  const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out";
 
-  // Convert to 12-hour format with AM/PM
-  const [hours, minutes] = time.split(':');
-  const hour12Format = `${((+hours + 11) % 12 + 1)}:${minutes} ${+hours >= 12 ? '' : ''}`;
+  // Create a new Date object with the provided dateTime
+  const dateObj = new Date(dateTime);
 
-  return isTimeIn 
-    ? { date: formattedDate, time: hour12Format } 
-    : { date: formattedDate, time: hour12Format };
+  // Get the offset in minutes between the local time and UTC
+  const offset = dateObj.getTimezoneOffset();
+
+  // Adjust the date object to the correct timezone (UTC+8 for Philippines)
+  const adjustedDateObj = new Date(dateObj.getTime() + offset * 60 * 1000);
+
+  // Format the date
+  const formattedDate = format(dateObj, "dd-MM-yyyy");
+
+  // Format the time in 12-hour h:mm AM/PM format
+  const hours = adjustedDateObj.getHours() % 12 || 12; // Converts 0 to 12 for 12-hour format
+  const minutes = String(adjustedDateObj.getMinutes()).padStart(2, '0');
+  const ampm = adjustedDateObj.getHours() >= 12 ? 'PM' : 'AM';
+
+  const formattedTime = `${hours}:${minutes} ${ampm}`;
+
+  return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
 };
+
+
 
 export default function Attendance() {
   const [userData, setUserData] = React.useState([]);
