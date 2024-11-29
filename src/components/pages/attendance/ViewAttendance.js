@@ -23,6 +23,7 @@ import { Marker, Popup } from "react-leaflet";
 import MapIcon from "@mui/icons-material/Map";
 import Modal from "@mui/material/Modal";
 
+
 export default function ViewAttendance() {
   const location = useLocation();
   const [attendanceData, setAttendanceData] = useState([]);
@@ -42,22 +43,35 @@ export default function ViewAttendance() {
 
   const userEmail = location.state?.userEmail || "";
 
-  // Function to format date and time
+
+
   const formatDateTime = (dateTime, isTimeIn = false) => {
-    if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out"; // Handle null dateTime for timeIn and timeOut
-
+    if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out";
+  
+    // Create a new Date object with the provided dateTime
     const dateObj = new Date(dateTime);
-
-    // Format the date as MM-DD-YYYY
+  
+    // Get the offset in minutes between the local time and UTC
+    const offset = dateObj.getTimezoneOffset();
+  
+    // Adjust the date object to the correct timezone (UTC+8 for Philippines)
+    const adjustedDateObj = new Date(dateObj.getTime() + offset * 60 * 1000);
+  
+    // Format the date
     const formattedDate = format(dateObj, "dd-MM-yyyy");
-
-    // Format the time as HH:mm (12-hour format)
-    const formattedTime = format(dateObj, "h:mm a");
-
-    return isTimeIn
-      ? { date: formattedDate, time: formattedTime }
-      : { date: formattedDate, time: formattedTime };
+  
+    // Format the time in 12-hour h:mm AM/PM format
+    const hours = adjustedDateObj.getHours() % 12 || 12; // Converts 0 to 12 for 12-hour format
+    const minutes = String(adjustedDateObj.getMinutes()).padStart(2, '0');
+    const ampm = adjustedDateObj.getHours() >= 12 ? 'PM' : 'AM';
+  
+    const formattedTime = `${hours}:${minutes} ${ampm}`;
+  
+    return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
   };
+
+  
+
 
   // Fetch attendance data for the specific user
   async function fetchAttendanceData(emailAddress) {
