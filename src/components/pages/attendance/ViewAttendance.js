@@ -70,7 +70,13 @@ export default function ViewAttendance() {
     return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
   };
 
-  
+  const capitalizeWords = (words) => {
+    if (!words || !Array.isArray(words)) return [];
+    
+    return words.map(word => 
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ''
+    );
+  };
 
 
   // Fetch attendance data for the specific user
@@ -92,9 +98,13 @@ export default function ViewAttendance() {
       }
 
       const { firstName, middleName, lastName } = user;
-      const fullName = `${firstName} ${
-        middleName ? middleName + " " : ""
-      }${lastName}`;
+    
+      // Capitalize names
+      const capitalizedNames = capitalizeWords([
+        firstName,
+        middleName || '',
+        lastName
+      ]);
 
       // Fetch attendance data
       const attendanceResponse = await axios.post(
@@ -114,7 +124,7 @@ export default function ViewAttendance() {
 
           return {
             ...item,
-            fullName, // Add full name here
+            fullName: `${capitalizedNames[0]} ${capitalizedNames[2]}`,
             date: formattedDate.date || "N/A",
             timeIn: formattedTimeIn.time || "No Time In",
             timeOut: formattedTimeOut.time || "No Time Out",
