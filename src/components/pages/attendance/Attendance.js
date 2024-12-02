@@ -203,7 +203,13 @@ export default function Attendance() {
     }
   }
   
-  
+  const capitalizeWords = (words) => {
+    if (!words || !Array.isArray(words)) return [];
+    
+    return words.map(word => 
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ''
+    );
+  };
 
   async function getUser() {
     try {
@@ -246,14 +252,21 @@ export default function Attendance() {
           if (displayedBranch === "No Branch" && !loggedInBranches.some(branch => user.accountNameBranchManning.includes(branch))) {
             return null; // Exclude this user by returning null
           }
+
+           // Capitalize names
+        const capitalizedNames = capitalizeWords([
+          user.firstName,
+          user.middleName || '',
+          user.lastName
+        ]);
   
           // Include user data with attendance or placeholders
           return {
             count: key + 1,
-            fullName: `${user.firstName} ${user.lastName}`,
-            firstName: user.firstName,
-            middleName: user.middleName || "null",
-            lastName: user.lastName,
+            fullName: `${capitalizedNames[0]} ${capitalizedNames[2]}`,
+            firstName: capitalizedNames[0],
+            middleName: capitalizedNames[1] || 'Null',
+            lastName: capitalizedNames[2],
             emailAddress: user.emailAddress,
             outlet: displayedBranch, // Show branch based on attendance or "No Branch"
             date: attendance?.date || "No Date", // Placeholder if no date is available

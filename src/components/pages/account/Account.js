@@ -160,6 +160,15 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
     }
   };
 
+  const capitalizeWords = (words) => {
+    if (!words || !Array.isArray(words)) return [];
+    
+    return words.map(word => 
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ''
+    );
+  };
+  
+
   const columns = [
     { field: "count", headerName: "#", width: 75 },
     {
@@ -354,15 +363,21 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
       });
   
       console.log(filteredData, "filtered user data");
-  
-      // Map the filtered data
+
+      
       const newData = filteredData.map((data, key) => {
+        const capitalizedNames = capitalizeWords([
+          data.firstName,
+          data.middleName || '',
+          data.lastName
+        ]);
+  
         return {
           count: key + 1,
           remarks: data.remarks,
-          firstName: data.firstName,
-          middleName: data.middleName ? data.middleName : "Null",
-          lastName: data.lastName,
+          firstName: capitalizedNames[0],
+          middleName: capitalizedNames[1] || 'Null',
+          lastName: capitalizedNames[2],
           username: data.username,
           Branch: data.accountNameBranchManning,
           emailAddress: data.emailAddress,
