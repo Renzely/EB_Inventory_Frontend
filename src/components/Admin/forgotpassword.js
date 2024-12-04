@@ -24,7 +24,7 @@ import { Visibility } from "@mui/icons-material";
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#4caf50', // Green color
+      main: 'rgb(26, 20, 71)', // Green color
     },
     background: {
       default: '#ffffff', // White background
@@ -187,7 +187,7 @@ export default function ForgotPassword() {
             <EmailIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Forgot Password
+            FORGOT PASSWORD
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <Stack>
@@ -202,10 +202,10 @@ export default function ForgotPassword() {
                 autoFocus
                 style={{ width: 300 }}
                 InputProps={{
-                  style: { color: 'green' }
+                  style: { color: '#000000' }
                 }}
                 InputLabelProps={{
-                  style: { color: 'green' }
+                  style: { color: 'rgb(26, 20, 71)' }
                 }}
               />
               {!otpComponent &&
@@ -245,10 +245,10 @@ export default function ForgotPassword() {
                   }}
                   autoFocus
                   InputProps={{
-                    style: { color: 'green' }
+                    style: { color: '#000000' }
                   }}
                   InputLabelProps={{
-                    style: { color: 'green' }
+                    style: { color: 'rgb(26, 20, 71)' }
                   }}
                 />
                 <Button
@@ -300,10 +300,10 @@ export default function ForgotPassword() {
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
-                  style: { color: 'green' }
+                  style: { color: 'rgb(26, 20, 71)' }
                 }}
                 InputLabelProps={{
-                  style: { color: 'green' }
+                  style: { color: 'rgb(26, 20, 71)' }
                 }}
               />
             </FormControl>
@@ -320,10 +320,10 @@ export default function ForgotPassword() {
                 type="password"
                 autoComplete='off'
                 InputProps={{
-                  style: { color: 'green' }
+                  style: { color: 'rgb(26, 20, 71)' }
                 }}
                 InputLabelProps={{
-                  style: { color: 'green' }
+                  style: { color: 'rgb(26, 20, 71)' }
                 }}
               />
             </FormControl>
