@@ -450,7 +450,7 @@ export default function Inventory() {
             });
         });
 
-        XLSX.utils.book_append_sheet(wb, ws, "Parcel_Data");
+        XLSX.utils.book_append_sheet(wb, ws, "Inventory_Data");
 
         const buffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
         const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
