@@ -231,6 +231,10 @@ export default function Attendance() {
       // Process users
       const filteredData = await Promise.all(
         data.map(async (user, key) => {
+
+          if (user.emailAddress === "ynsonharold@gmail.com") {
+            return null;
+          }
           // Fetch attendance for each user
           const attendance = await fetchCurrentAttendance(user.emailAddress).catch(() => null);
   
