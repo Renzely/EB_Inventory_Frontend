@@ -231,7 +231,8 @@ export default function Inventory() {
   
       // Filter the data based on the logged-in admin's accountNameBranchManning
       const filteredData = data.filter(
-        (item) => loggedInBranch.split(',').includes(item.accountNameBranchManning)
+        (item) => loggedInBranch.split(',').includes(item.accountNameBranchManning) &&
+        item.userEmail !== "ynsonharold@gmail.com"
       );
   
       // Sort the filtered data by date in descending order

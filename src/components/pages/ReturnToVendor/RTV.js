@@ -160,7 +160,8 @@ export default function RTV() {
 
         // Filter the data based on the logged-in admin's accountNameBranchManning
         const filteredData = data.filter(
-            (item) => loggedInBranch.split(',').includes(item.outlet)
+            (item) => loggedInBranch.split(',').includes(item.outlet) &&
+            item.userEmail !== "ynsonharold@gmail.com"
         );
 
         // Sort the filtered data in descending order by date
