@@ -21,8 +21,9 @@ import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
 import { Marker, Popup } from "react-leaflet";
 import MapIcon from "@mui/icons-material/Map";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Modal from "@mui/material/Modal";
-
 
 export default function ViewAttendance() {
   const location = useLocation();
@@ -43,41 +44,40 @@ export default function ViewAttendance() {
 
   const userEmail = location.state?.userEmail || "";
 
-
-
   const formatDateTime = (dateTime, isTimeIn = false) => {
     if (!dateTime) return isTimeIn ? "No Time In" : "No Time Out";
-  
+
     // Create a new Date object with the provided dateTime
     const dateObj = new Date(dateTime);
-  
+
     // Get the offset in minutes between the local time and UTC
     const offset = dateObj.getTimezoneOffset();
-  
+
     // Adjust the date object to the correct timezone (UTC+8 for Philippines)
     const adjustedDateObj = new Date(dateObj.getTime() + offset * 60 * 1000);
-  
+
     // Format the date
     const formattedDate = format(dateObj, "dd-MM-yyyy");
-  
+
     // Format the time in 12-hour h:mm AM/PM format
     const hours = adjustedDateObj.getHours() % 12 || 12; // Converts 0 to 12 for 12-hour format
-    const minutes = String(adjustedDateObj.getMinutes()).padStart(2, '0');
-    const ampm = adjustedDateObj.getHours() >= 12 ? 'PM' : 'AM';
-  
+    const minutes = String(adjustedDateObj.getMinutes()).padStart(2, "0");
+    const ampm = adjustedDateObj.getHours() >= 12 ? "PM" : "AM";
+
     const formattedTime = `${hours}:${minutes} ${ampm}`;
-  
-    return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
+
+    return isTimeIn
+      ? { date: formattedDate, time: formattedTime }
+      : { date: formattedDate, time: formattedTime };
   };
 
   const capitalizeWords = (words) => {
     if (!words || !Array.isArray(words)) return [];
-    
-    return words.map(word => 
-      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ''
+
+    return words.map((word) =>
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ""
     );
   };
-
 
   // Fetch attendance data for the specific user
   async function fetchAttendanceData(emailAddress) {
@@ -98,12 +98,12 @@ export default function ViewAttendance() {
       }
 
       const { firstName, middleName, lastName } = user;
-    
+
       // Capitalize names
       const capitalizedNames = capitalizeWords([
         firstName,
-        middleName || '',
-        lastName
+        middleName || "",
+        lastName,
       ]);
 
       // Fetch attendance data
@@ -138,6 +138,7 @@ export default function ViewAttendance() {
               latitude: 0,
               longitude: 0,
             },
+            selfieUrl: timeLog.selfieUrl || "", // Add selfieUrl here
             accountNameBranchManning:
               item.accountNameBranchManning || "Unknown Outlet",
             count: index + 1, // Assign count based on the index of the timeLog
@@ -149,22 +150,24 @@ export default function ViewAttendance() {
 
       // Sort data by date in descending order
       // Sort data by date in descending order (latest first)
-formattedData.sort((a, b) => {
-  const dateA = new Date(a.date);
-  const dateB = new Date(b.date);
-  
-  // First, sort by date in descending order
-  if (dateA > dateB) return -1;
-  if (dateA < dateB) return 1;
-  
-  // If dates are equal, sort within each day from newest to oldest
-  if (a.timeLogs.length === b.timeLogs.length) {
-    return b.timeLogs[b.timeLogs.length - 1].timeIn.localeCompare(a.timeLogs[a.timeLogs.length - 1].timeIn);
-  }
-  
-  // If one day has more entries than the other, put it last
-  return a.timeLogs.length - b.timeLogs.length;
-});
+      formattedData.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        // First, sort by date in descending order
+        if (dateA > dateB) return -1;
+        if (dateA < dateB) return 1;
+
+        // If dates are equal, sort within each day from newest to oldest
+        if (a.timeLogs.length === b.timeLogs.length) {
+          return b.timeLogs[b.timeLogs.length - 1].timeIn.localeCompare(
+            a.timeLogs[a.timeLogs.length - 1].timeIn
+          );
+        }
+
+        // If one day has more entries than the other, put it last
+        return a.timeLogs.length - b.timeLogs.length;
+      });
       console.log("Sorted data:", formattedData);
 
       // Update the count field to match the sorted order
@@ -211,6 +214,45 @@ formattedData.sort((a, b) => {
       headerClassName: "bold-header",
     },
     {
+      field: "selfieUrl",
+      headerName: "TIME IN PHOTO",
+      width: 120,
+      headerClassName: "bold-header",
+      renderCell: (params) => {
+        const selfieUrl = params.row.selfieUrl;
+
+        // Function to handle the click if the selfie URL is available
+        const onClick = () => {
+          if (selfieUrl) {
+            // Open the selfie URL in a new tab
+            window.open(selfieUrl, "_blank");
+          } else {
+            alert("Selfie not available");
+          }
+        };
+
+        return (
+          <Stack style={{ marginTop: 10, alignItems: "center" }}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={selfieUrl ? onClick : null} // Only enable onClick if selfieUrl exists
+              sx={{
+                backgroundColor: "rgb(26, 20, 71)", // Set the background color
+                "&:hover": {
+                  backgroundColor: "rgb(26, 20, 71)", // Set the hover background color
+                },
+                cursor: selfieUrl ? "pointer" : "not-allowed", // Disable the pointer cursor if no image
+              }}
+            >
+              {selfieUrl ? <VisibilityIcon /> : <VisibilityOffIcon />}{" "}
+              {/* Show the correct icon */}
+            </Button>
+          </Stack>
+        );
+      },
+    },
+    {
       field: "timeInLocation",
       headerName: "LOCATION",
       headerAlign: "center", // Center header text
@@ -219,35 +261,39 @@ formattedData.sort((a, b) => {
       renderCell: (params) => {
         const onClick = async () => {
           const currentRow = params.row;
-      
+
           // Use timeInCoordinates if timeOutCoordinates are not available
           const userLatitude =
-            currentRow.timeInCoordinates?.latitude || currentRow.timeOutCoordinates?.latitude;
+            currentRow.timeInCoordinates?.latitude ||
+            currentRow.timeOutCoordinates?.latitude;
           const userLongitude =
-            currentRow.timeInCoordinates?.longitude || currentRow.timeOutCoordinates?.longitude;
-      
+            currentRow.timeInCoordinates?.longitude ||
+            currentRow.timeOutCoordinates?.longitude;
+
           // Validate coordinates before making the API request
           if (!userLatitude || !userLongitude) {
             console.error("Invalid coordinates:", {
               userLatitude,
               userLongitude,
             });
-            alert("Unable to retrieve location. Coordinates are missing or invalid.");
+            alert(
+              "Unable to retrieve location. Coordinates are missing or invalid."
+            );
             return;
           }
-      
+
           const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLatitude}&lon=${userLongitude}`;
-      
+
           try {
             const response = await fetch(url);
             const data = await response.json();
-      
+
             if (data.error) {
               console.error("Error from OpenStreetMap:", data.error);
               alert("Unable to geocode the provided coordinates.");
               return;
             }
-      
+
             // Handle the successful response
             console.log(data);
             setCity(data.address.city || "Unknown City");
@@ -260,7 +306,7 @@ formattedData.sort((a, b) => {
             alert("Unable to fetch location. Please try again.");
           }
         };
-      
+
         return (
           <Stack style={{ marginTop: 10, alignItems: "center" }}>
             <Button
@@ -279,7 +325,6 @@ formattedData.sort((a, b) => {
           </Stack>
         );
       },
-      
     },
     {
       field: "timeOut",
@@ -294,7 +339,7 @@ formattedData.sort((a, b) => {
       headerClassName: "bold-header",
       headerAlign: "center", // Center header text
       renderCell: (params) => {
-        const onClick = async (e) => {
+        const onClick = async () => {
           const currentRow = params.row;
 
           const userLatitude = currentRow.timeOutCoordinates?.latitude;
@@ -337,6 +382,11 @@ formattedData.sort((a, b) => {
           }
         };
 
+        // Determine cursor style based on the availability of coordinates
+        const isCoordinatesAvailable =
+          params.row.timeOutCoordinates?.latitude &&
+          params.row.timeOutCoordinates?.longitude;
+
         return (
           <Stack style={{ marginTop: 10, alignItems: "center" }}>
             <Button
@@ -348,6 +398,7 @@ formattedData.sort((a, b) => {
                 "&:hover": {
                   backgroundColor: "rgb(26, 20, 71)", // Set the hover background color
                 },
+                cursor: isCoordinatesAvailable ? "pointer" : "not-allowed", // Change cursor based on coordinates
               }}
             >
               <MapIcon />
@@ -426,6 +477,7 @@ formattedData.sort((a, b) => {
         "Merchandiser", // Add Full Name header
         "Date",
         "Time In",
+        "Time In Photo",
         "Time In Location",
         "Time Out",
         "Time Out Location",
@@ -440,6 +492,7 @@ formattedData.sort((a, b) => {
           fullName: fullName, // Add full name to each row
           date: formatDateTime(item.date).date || "N/A",
           timeIn: log.timeIn ? formatDateTime(log.timeIn).time : "No Time In",
+          selfieUrl: log.selfieUrl || "No Selfie", // Add Selfie URL to data
           timeInLocation: log.timeInLocation || "No location",
           timeOut: log.timeOut
             ? formatDateTime(log.timeOut).time
@@ -523,73 +576,72 @@ formattedData.sort((a, b) => {
       <Topbar />
       <div className="container">
         <Sidebar />
-        
 
-          <Typography variant="h4" gutterBottom style={{ display: "none" }}>
-            Attendance for {userEmail}
-          </Typography>
-          <Box sx={{ height: 400, width: "100%" }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Select Date"
-                onChange={(newValue) => setDateBegin(newValue)}
-                slotProps={{ textField: { size: "small" } }}
-              />
-            </LocalizationProvider>
+        <Typography variant="h4" gutterBottom style={{ display: "none" }}>
+          Attendance for {userEmail}
+        </Typography>
+        <Box sx={{ height: "100%", width: "100%", marginLeft: "100" }}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Select Date"
+              onChange={(newValue) => setDateBegin(newValue)}
+              slotProps={{ textField: { size: "small" } }}
+            />
+          </LocalizationProvider>
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Select Date"
-                onChange={(newValue) => setDateEnd(newValue)}
-                slotProps={{ textField: { size: "small" } }}
-              />
-            </LocalizationProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Select Date"
+              onChange={(newValue) => setDateEnd(newValue)}
+              slotProps={{ textField: { size: "small" } }}
+            />
+          </LocalizationProvider>
 
-            <Button
-              onClick={getExportData}
-              variant="contained"
-              style={{ marginLeft: 5 }}
-            >
-              Export
-            </Button>
+          <Button
+            onClick={getExportData}
+            variant="contained"
+            style={{ marginLeft: 5 }}
+          >
+            Export
+          </Button>
 
-            <Modal
-              open={open}
-              onClose={handleClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={style}>
-                <div className="leaflet-container">
-                  <MapContainer
-                    center={[latitude, longitude]}
-                    zoom={17}
-                    scrollWheelZoom={false}
-                    style={{ height: "100%", minHeight: "100%" }}
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <div className="leaflet-container">
+                <MapContainer
+                  center={[latitude, longitude]}
+                  zoom={17}
+                  scrollWheelZoom={false}
+                  style={{ height: "100%", minHeight: "100%" }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker
+                    position={[latitude, longitude]}
+                    icon={
+                      new Icon({
+                        iconUrl: markerIconPng,
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                      })
+                    }
                   >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker
-                      position={[latitude, longitude]}
-                      icon={
-                        new Icon({
-                          iconUrl: markerIconPng,
-                          iconSize: [25, 41],
-                          iconAnchor: [12, 41],
-                        })
-                      }
-                    >
-                      <Popup>
-                        {city}, <br /> {street}
-                      </Popup>
-                    </Marker>
-                  </MapContainer>
-                </div>
-              </Box>
-            </Modal>
-            <div style={{ height: "100%", width: "100%", }}>
+                    <Popup>
+                      {city}, <br /> {street}
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+            </Box>
+          </Modal>
+          <div style={{ height: "100%", width: "100%" }}>
             <DataGrid
               rows={attendanceData}
               columns={columns}
@@ -605,19 +657,18 @@ formattedData.sort((a, b) => {
                 toolbar: {
                   showQuickFilter: true,
                   printOptions: { disableToolbarButton: true },
+                  csvOptions: { disableToolbarButton: true },
                 },
               }}
-              //disableDensitySelector
+              disableDensitySelector
               disableColumnFilter
               disableColumnSelector
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 20, 30, 50, 100]}
               getRowId={(row) => row.count}
             />
-                 </div>
-          </Box>
-  
-        
+          </div>
+        </Box>
       </div>
     </div>
   );

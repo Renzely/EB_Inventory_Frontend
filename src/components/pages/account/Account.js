@@ -23,7 +23,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useDemoData } from "@mui/x-data-grid-generator";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { Autocomplete } from "@mui/material";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
 
 const style = {
   position: "absolute",
@@ -71,9 +71,13 @@ export default function Account() {
 
   const [openDialog, setOpenDialog] = React.useState(false);
   const roleAccount = localStorage.getItem("roleAccount"); // Get roleAccount from localStorage
-  const allowedRoles = ["ACCOUNT SUPERVISOR", "OPERATION OFFICER", "OPERATION HEAD", "COORDINATOR"];
-const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowed
-
+  const allowedRoles = [
+    "ACCOUNT SUPERVISOR",
+    "OPERATION OFFICER",
+    "OPERATION HEAD",
+    "COORDINATOR",
+  ];
+  const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowed
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -85,34 +89,33 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
 
   const [branches, setBranches] = React.useState([
     "S&R ALABANG",
-"S&R NUVALI",
-"S&R BACOOR",
-"S&R IMUS",
-"S&R KAWIT",
-"S&R SUCAT",
-"S&R PARANAQUE",
-"S&R ASEANA",
-"S&R FORT",
-"S&R SHAW",
-"S&R CIRCUIT",
-"S&R COMMONWEALTH",
-"S&R CONGRESSIONAL",
-"S&R MARIKINA",
-"S&R C5 LIBIS",
-"S&R PAMPANGA",
-"S&R DAU",
-"S&R CEBU",
-"S&R ILOILO",
-"S&R LIPA",
-"S&R LUCENA",
-"S&R MALOLOS",
-"S&R NAGA",
-"S&R BACOLOD",
-"S&R CABANATUAN",
-"S&R CALASIAO",
-"S&R CDO",
-"S&R DAVAO"
-
+    "S&R NUVALI",
+    "S&R BACOOR",
+    "S&R IMUS",
+    "S&R KAWIT",
+    "S&R SUCAT",
+    "S&R PARANAQUE",
+    "S&R ASEANA",
+    "S&R FORT",
+    "S&R SHAW",
+    "S&R CIRCUIT",
+    "S&R COMMONWEALTH",
+    "S&R CONGRESSIONAL",
+    "S&R MARIKINA",
+    "S&R C5 LIBIS",
+    "S&R PAMPANGA",
+    "S&R DAU",
+    "S&R CEBU",
+    "S&R ILOILO",
+    "S&R LIPA",
+    "S&R LUCENA",
+    "S&R MALOLOS",
+    "S&R NAGA",
+    "S&R BACOLOD",
+    "S&R CABANATUAN",
+    "S&R CALASIAO",
+    "S&R CDO",
+    "S&R DAVAO",
   ]); //Branches
 
   // State for the second modal
@@ -162,12 +165,11 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
 
   const capitalizeWords = (words) => {
     if (!words || !Array.isArray(words)) return [];
-    
-    return words.map(word => 
-      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ''
+
+    return words.map((word) =>
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ""
     );
   };
-  
 
   const columns = [
     { field: "count", headerName: "#", width: 75 },
@@ -325,7 +327,7 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
                 color: "#FFFFF",
               }}
             >
-             <PersonIcon />
+              <PersonIcon />
             </Button>
           </Stack>
         );
@@ -337,46 +339,54 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
     try {
       // Retrieve the logged-in admin's accountNameBranchManning from localStorage
       const loggedInBranch = localStorage.getItem("accountNameBranchManning");
-  
-      console.log("Logged in branch:", loggedInBranch);  // Debugging line
-  
+
+      console.log("Logged in branch:", loggedInBranch); // Debugging line
+
       if (!loggedInBranch) {
         console.error("No branch information found for the logged-in admin.");
         return;
       }
-  
+
       // Split the loggedInBranch string into an array for comparison
-      const loggedInBranches = loggedInBranch.split(',').map(branch => branch.trim());  // Trimming whitespace
-  
+      const loggedInBranches = loggedInBranch
+        .split(",")
+        .map((branch) => branch.trim()); // Trimming whitespace
+
       // Send request to get all user data
-      const response = await axios.post("https://eb-inventory-backend.onrender.com/get-all-user", requestBody);
-  
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/get-all-user",
+        requestBody
+      );
+
       const data = response.data.data;
-  
-      console.log("User data:", data);  // Debugging line
-  
+
+      console.log("User data:", data); // Debugging line
+
       // Filter the data based on the logged-in admin's accountNameBranchManning
       const filteredData = data.filter((item) => {
-        console.log("Checking branch for user:", item.accountNameBranchManning);  // Debugging line
+        console.log("Checking branch for user:", item.accountNameBranchManning); // Debugging line
         // Check if any branch in loggedInBranches matches any branch in item.accountNameBranchManning
-        return loggedInBranches.some(branch => item.accountNameBranchManning.includes(branch)) && item.emailAddress !== "ynsonharold@gmail.com";
+        return (
+          loggedInBranches.some((branch) =>
+            item.accountNameBranchManning.includes(branch)
+          ) 
+        );
       });
-  
+
       console.log(filteredData, "filtered user data");
 
-      
       const newData = filteredData.map((data, key) => {
         const capitalizedNames = capitalizeWords([
           data.firstName,
-          data.middleName || '',
-          data.lastName
+          data.middleName || "",
+          data.lastName,
         ]);
-  
+
         return {
           count: key + 1,
           remarks: data.remarks,
           firstName: capitalizedNames[0],
-          middleName: capitalizedNames[1] || 'Null',
+          middleName: capitalizedNames[1] || "Null",
           lastName: capitalizedNames[2],
           username: data.username,
           Branch: data.accountNameBranchManning,
@@ -385,14 +395,13 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
           isActive: data.isActivate,
         };
       });
-  
+
       console.log(newData, "filtered and mapped user data");
-      setUserData(newData);  // Set the filtered data for rendering
+      setUserData(newData); // Set the filtered data for rendering
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   }
-  
 
   async function setStatus() {
     console.log("check body", requestBody);
@@ -456,83 +465,94 @@ const isAllowed = allowedRoles.includes(roleAccount); // Check if role is allowe
         </div>
 
         <Modal
-  open={openModal}
-  onClose={handleCloseDialog}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-    <Typography id="modal-modal-title" variant="h6" component="h2">
-      Full Details :
-    </Typography>
-    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-      <span className="detailTitle">Full name:</span>
-      <span className="detailDescription">{modalFullName}</span>
-      <br />
-      <span className="detailTitle">Email:</span>
-      <span className="detailDescription">{modalEmail}</span>
-      <br />
-      <span className="detailTitle">Contact Number:</span>
-      <span className="detailDescription">{modalPhone}</span>
-      <br />
-      <span className="detailTitle">Account Branch Name:</span>
-      <span className="detailDescription">
-        {Array.isArray(modalBranch) 
-          ? modalBranch.join(", ") // Join with a comma and space if it's an array
-          : modalBranch}
-      </span>
-      <br />
-      <br />
-      {/* Button to open branch selection modal */}
-      <Button
-        variant="contained"
-        onClick={handleOpenBranchModal}
-        disabled={!isAllowed} 
-      >
-        Select Branch
-      </Button>
-    </Typography>
-    <Stack>
-      <DialogActions>
-        <Button onClick={handleClose}>Close</Button>
-      </DialogActions>
-    </Stack>
-  </Box>
-</Modal>
+          open={openModal}
+          onClose={handleCloseDialog}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Full Details :
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              <span className="detailTitle">Full name: </span>
+              <span className="detailDescription">{modalFullName}</span>
+              <br />
+              <span className="detailTitle">Email: </span>
+              <span className="detailDescription">{modalEmail}</span>
+              <br />
+              <span className="detailTitle">Contact Number: </span>
+              <span className="detailDescription">{modalPhone}</span>
+              <br />
+              <span className="detailTitle">Outlets: </span>
+              <span className="detailDescription">
+                {Array.isArray(modalBranch)
+                  ? modalBranch.join(", ") // Join with a comma and space if it's an array
+                  : modalBranch}
+              </span>
+              <br />
+              <br />
+              {/* Button to open branch selection modal */}
+              <Button
+                variant="contained"
+                onClick={handleOpenBranchModal}
+                disabled={!isAllowed}
+                sx={{
+                  backgroundColor: "rgb(26, 20, 71)", // Custom background color
+                  color: "white", // Text color
+                  "&:hover": {
+                    backgroundColor: "rgb(40, 30, 100)", // Hover background color
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: "rgba(0, 0, 0, 0.26)", // Disabled state background color
+                    color: "rgba(255, 255, 255, 0.5)", // Disabled text color
+                  },
+                }}
+              >
+                Select Outlet
+              </Button>
+            </Typography>
+            <Stack>
+              <DialogActions>
+                <Button onClick={handleClose}>Close</Button>
+              </DialogActions>
+            </Stack>
+          </Box>
+        </Modal>
 
-<Dialog
-  open={openBranchModal}
-  onClose={handleCloseBranchModal}
-  aria-labelledby="branch-dialog-title"
-  aria-describedby="branch-dialog-description"
-  fullWidth
-  maxWidth="md"
->
-  <DialogTitle id="branch-dialog-title">Select Branch</DialogTitle>
-  <DialogContent>
-    <Autocomplete
-      multiple
-      id="branches-autocomplete"
-      options={branches}
-      defaultValue={selectedBranches}
-      onChange={(event, value) => setSelectedBranches(value)}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          variant="outlined"
-          label="Select Branch"
-          placeholder="Select Branch"
-        />
-      )}
-    />
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={handleCloseBranchModal}>Cancel</Button>
-    <Button onClick={handleBranchSave} autoFocus>
-      Save
-    </Button>
-  </DialogActions>
-</Dialog>
+        <Dialog
+          open={openBranchModal}
+          onClose={handleCloseBranchModal}
+          aria-labelledby="branch-dialog-title"
+          aria-describedby="branch-dialog-description"
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle id="branch-dialog-title">Select Branch</DialogTitle>
+          <DialogContent>
+            <Autocomplete
+              multiple
+              id="branches-autocomplete"
+              options={branches}
+              defaultValue={selectedBranches}
+              onChange={(event, value) => setSelectedBranches(value)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Select Branch"
+                  placeholder="Select Branch"
+                />
+              )}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseBranchModal}>Cancel</Button>
+            <Button onClick={handleBranchSave} autoFocus>
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog
           open={openDialog}

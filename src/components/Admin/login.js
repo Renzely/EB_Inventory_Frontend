@@ -1,26 +1,26 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import * as React from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Swal from "sweetalert2";
-import logo from './Studio-Project.png';
+import logo from "./Studio-Project.png";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: 'rgb(26, 20, 71)', // Green color
+      main: "rgb(26, 20, 71)", // Green color
     },
     background: {
-      default: '#ffffff', // White background
+      default: "#ffffff", // White background
     },
   },
 });
@@ -31,21 +31,24 @@ export default function Login() {
     const data = new FormData(event.currentTarget);
 
     const body = {
-      emailAddress: data.get('email'),
-      password: data.get('password')
-    }
+      emailAddress: data.get("email"),
+      password: data.get("password"),
+    };
 
     if (!body.emailAddress || !body.password) {
       Swal.fire({
         title: "Unable to Proceed",
         text: "Please input your credentials",
-        icon: "warning"
+        icon: "warning",
       });
       return;
     }
 
     try {
-      const response = await axios.post('https://eb-inventory-backend.onrender.com/login-admin', body);
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/login-admin",
+        body
+      );
       const data = await response.data;
 
       if (data.status === 200) {
@@ -56,30 +59,32 @@ export default function Login() {
         }).then((result) => {
           if (result.isConfirmed) {
             // Log the accountNameBranchManning before saving
-            console.log('Branch Manning:', data.data.accountNameBranchManning);
-      
-            localStorage.setItem('isLoggedIn', "admin");
-            localStorage.setItem('firstName', data.data.firstName); // Store firstName
-            localStorage.setItem('lastName', data.data.lastName);   // Store lastName
-            localStorage.setItem('roleAccount', data.data.roleAccount); // Store roleAccount
-            localStorage.setItem('accountNameBranchManning', data.data.accountNameBranchManning); // Store branch info
-      
+            console.log("Branch Manning:", data.data.accountNameBranchManning);
+
+            localStorage.setItem("isLoggedIn", "admin");
+            localStorage.setItem("firstName", data.data.firstName); // Store firstName
+            localStorage.setItem("lastName", data.data.lastName); // Store lastName
+            localStorage.setItem("roleAccount", data.data.roleAccount); // Store roleAccount
+            localStorage.setItem(
+              "accountNameBranchManning",
+              data.data.accountNameBranchManning
+            ); // Store branch info
+
             // Redirect to the next page
-            window.location.href = '/view-accounts';
+            window.location.href = "/view-accounts";
           }
         });
-      }
-       else if (data.status === 401) {
+      } else if (data.status === 401) {
         Swal.fire({
           title: "Login Failed!",
           text: data.data,
-          icon: "error"
+          icon: "error",
         });
       } else {
         Swal.fire({
           title: "Login Error!",
           text: data.data,
-          icon: "error"
+          icon: "error",
         });
       }
     } catch (error) {
@@ -87,7 +92,7 @@ export default function Login() {
       Swal.fire({
         title: "Login Error!",
         text: "Something went wrong. Please try again later.",
-        icon: "error"
+        icon: "error",
       });
     }
   };
@@ -99,16 +104,25 @@ export default function Login() {
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          <img src={logo} alt="Logo" style={{ width: '150px', marginBottom: '16px' }} />
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ width: "150px", marginBottom: "16px" }}
+          />
           <Typography component="h1" variant="h5">
             SIGN IN
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
               margin="normal"
               required
@@ -119,10 +133,10 @@ export default function Login() {
               autoComplete="email"
               autoFocus
               InputProps={{
-                style: { color: '#000000' }
+                style: { color: "#000000" },
               }}
               InputLabelProps={{
-                style: { color: 'rgb(26, 20, 71)' }
+                style: { color: "rgb(26, 20, 71)" },
               }}
             />
             <TextField
@@ -135,10 +149,10 @@ export default function Login() {
               id="password"
               autoComplete="current-password"
               InputProps={{
-                style: { color: '#000000' }
+                style: { color: "#000000" },
               }}
               InputLabelProps={{
-                style: { color: 'rgb(26, 20, 71)' }
+                style: { color: "rgb(26, 20, 71)" },
               }}
             />
             <Button
@@ -151,7 +165,11 @@ export default function Login() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="/forgotpassword" variant="body2" style={{ color: 'rgb(26, 20, 71)' }}>
+                <Link
+                  href="/forgotpassword"
+                  variant="body2"
+                  style={{ color: "rgb(26, 20, 71)" }}
+                >
                   Forgot password?
                 </Link>
               </Grid>

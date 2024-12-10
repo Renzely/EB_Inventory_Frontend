@@ -14,10 +14,10 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import { Link } from "react-router-dom";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useState } from 'react';
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useState } from "react";
 
 const style = {
   position: "absolute",
@@ -38,11 +38,9 @@ export default function Inventory() {
   const [dateBegin, setDateBegin] = React.useState(null);
   const [dateEnd, setDateEnd] = React.useState(null);
   const [sheetData, setSheetData] = React.useState(null);
-  const XLSX = require('sheetjs-style');
+  const XLSX = require("sheetjs-style");
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-
 
   const columns = [
     {
@@ -164,7 +162,10 @@ export default function Inventory() {
           return (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {expiryFields.map((field, index) => (
-                <div key={index} style={{ display: "flex", flexDirection: "row" }}>
+                <div
+                  key={index}
+                  style={{ display: "flex", flexDirection: "row" }}
+                >
                   {`MONTH: ${field.expiryMonth} PCS: ${field.expiryPcs} ||`}
                 </div>
               ))}
@@ -179,7 +180,9 @@ export default function Inventory() {
         if (Array.isArray(expiryFields) && expiryFields.length > 0) {
           return expiryFields
             .slice(0, 6) // Limit to 6 entries, if necessary
-            .map((field) => `MONTH: ${field.expiryMonth}, PCS: ${field.expiryPcs}`)
+            .map(
+              (field) => `MONTH: ${field.expiryMonth}, PCS: ${field.expiryPcs}`
+            )
             .join(" | ");
         }
         return "No expiry fields";
@@ -208,36 +211,41 @@ export default function Inventory() {
       headerName: "REMARKS",
       width: 150,
       headerClassName: "bold-header",
-    }
+    },
   ];
 
   async function getUser() {
     try {
       // Retrieve the logged-in admin's accountNameBranchManning from localStorage
       const loggedInBranch = localStorage.getItem("accountNameBranchManning");
-  
-      console.log("Logged in branch:", loggedInBranch);  // Debugging line
-  
+
+      console.log("Logged in branch:", loggedInBranch); // Debugging line
+
       if (!loggedInBranch) {
         console.error("No branch information found for the logged-in admin.");
         return;
       }
-  
+
       // Fetch the inventory data
-      const response = await axios.post("https://eb-inventory-backend.onrender.com/inventory-data");
-  
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/inventory-data"
+      );
+
       const data = response.data.data;
       console.log(data, "backend response");
-  
+
       // Filter the data based on the logged-in admin's accountNameBranchManning
       const filteredData = data.filter(
-        (item) => loggedInBranch.split(',').includes(item.accountNameBranchManning) &&
-        item.userEmail !== "ynsonharold@gmail.com"
+        (item) =>
+          loggedInBranch.split(",").includes(item.accountNameBranchManning) &&
+          item.userEmail !== "ynsonharold@gmail.com"
       );
-  
+
       // Sort the filtered data by date in descending order
-      const sortedData = filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
+      const sortedData = filteredData.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+
       // Map the filtered and sorted data
       const newData = sortedData.map((data, key) => {
         const value = (status, defaultValue) => {
@@ -245,7 +253,7 @@ export default function Inventory() {
           if (status === "Not Carried") return "NC";
           return defaultValue || 0;
         };
-  
+
         return {
           count: key + 1,
           date: data.date,
@@ -273,15 +281,14 @@ export default function Inventory() {
           expiryFields: data.expiryFields, // Ensure expiryFields is included
         };
       });
-  
+
       console.log(newData, "mapped data");
       setUserData(newData); // Set the filtered data for rendering
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  
-  
+
   async function getDate(selectedDate) {
     const data = { selectDate: selectedDate };
     await axios
@@ -290,7 +297,9 @@ export default function Inventory() {
         const data = await response.data.data;
         console.log(data, "test");
 
-        const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const sortedData = data.sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
 
         const newData = sortedData.map((data, key) => {
           const value = (status, defaultValue) => {
@@ -337,170 +346,197 @@ export default function Inventory() {
 
   const getExportData = async () => {
     if (dateBegin === null || dateEnd === null) {
-        return alert("Please fill date fields");
+      return alert("Please fill date fields");
     }
 
     let bDate = dateBegin.$d.getTime();
     let eDate = dateEnd.$d.getTime();
 
     if (eDate - bDate <= 0) {
-        return alert("End date must be ahead of or the same as the start date");
+      return alert("End date must be ahead of or the same as the start date");
     }
 
     try {
-        const response = await axios.post('https://eb-inventory-backend.onrender.com/export-inventory-data', {
-            start: bDate,
-            end: eDate
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/export-inventory-data",
+        {
+          start: bDate,
+          end: eDate,
+        }
+      );
+
+      const headers = [
+        "#",
+        "Inventory Number",
+        "Date",
+        "Fullname",
+        "Outlet",
+        "Weeks Covered",
+        "Month",
+        "Week",
+        "SKU",
+        "4-Pack Barcode",
+        "Status",
+        "BeginningSA",
+        "BeginningWA",
+        "Beginning",
+        "Delivery",
+        "EndingSA",
+        "EndingWA",
+        "Ending",
+        "Expiry Fields",
+        "Offtake",
+        "Inventory Days Level",
+        "No of Days OOS",
+        "Remarks OOS",
+      ];
+
+      const newData = response.data.data.map((item, key) => ({
+        count: key + 1,
+        inputId: item.inputId,
+        date: item.date,
+        name: item.name,
+        accountNameBranchManning: item.accountNameBranchManning,
+        period: item.period,
+        month: item.month,
+        week: item.week,
+        skuDescription: item.skuDescription,
+        skuCode: item.skuCode,
+        status: item.status,
+        beginningSA: item.beginningSA,
+        beginningWA: item.beginningWA,
+        beginning: item.beginning,
+        delivery: item.delivery,
+        endingSA: item.endingSA,
+        endingWA: item.endingWA,
+        ending: item.ending,
+        expiryFields: item.expiryFields
+          ? item.expiryFields
+              .map(
+                (field) =>
+                  `${field.expiryMonth || ""}: ${field.expiryPcs || ""}`
+              )
+              .join(", ")
+          : "",
+        offtake: item.offtake,
+        inventoryDaysLevel: item.inventoryDaysLevel
+          ? item.inventoryDaysLevel.toFixed(2)
+          : "",
+        noOfDaysOOS: item.noOfDaysOOS,
+        remarksOOS: item.remarksOOS,
+      }));
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet([]);
+
+      // Add headers and data
+      XLSX.utils.sheet_add_aoa(ws, [headers], { origin: "A1" });
+      XLSX.utils.sheet_add_json(ws, newData, {
+        origin: "A2",
+        skipHeader: true,
+      });
+
+      // Calculate dynamic column widths for SKU and Inventory Days Level
+      const colWidths = headers.map((header, index) => {
+        if (header === "SKU" || header === "Inventory Days Level") {
+          const maxLength = Math.max(
+            header.length, // Length of the header
+            ...newData.map(
+              (row) => (row[Object.keys(row)[index]] || "").toString().length
+            ) // Length of data in the column
+          );
+          return { wch: maxLength + 6 }; // Add padding for better appearance
+        }
+        return { wch: Math.max(header.length, 15) }; // Default width for other columns
+      });
+
+      ws["!cols"] = colWidths;
+
+      // Apply bold styling to headers
+      headers.forEach((_, index) => {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: index });
+        if (!ws[cellAddress]) return;
+        ws[cellAddress].s = {
+          font: { bold: true },
+          alignment: { horizontal: "center", vertical: "center" },
+        };
+      });
+
+      // Apply center alignment to all data cells
+      newData.forEach((row, rowIndex) => {
+        Object.keys(row).forEach((_, colIndex) => {
+          const cellAddress = XLSX.utils.encode_cell({
+            r: rowIndex + 1,
+            c: colIndex,
+          }); // Row index starts at 1 for data
+          if (!ws[cellAddress]) return;
+          ws[cellAddress].s = {
+            alignment: { horizontal: "center", vertical: "center" },
+          };
         });
+      });
 
-        const headers = [
-            "#",
-            "Inventory Number",
-            "Date",
-            "Fullname",
-            "Outlet",
-            "Weeks Covered",
-            "Month",
-            "Week",
-            "SKU",
-            "4-Pack Barcode",
-            "Status",
-            "BeginningSA",
-            "BeginningWA",
-            "Beginning",
-            "Delivery",
-            "EndingSA",
-            "EndingWA",
-            "Ending",
-            "Expiry Fields",
-            "Offtake",
-            "Inventory Days Level",
-            "No of Days OOS",
-            "Remarks OOS"
-        ];
+      XLSX.utils.book_append_sheet(wb, ws, "Inventory_Data");
 
-        const newData = response.data.data.map((item, key) => ({
-            count: key + 1,
-            inputId: item.inputId,
-            date: item.date,
-            name: item.name,
-            accountNameBranchManning: item.accountNameBranchManning,
-            period: item.period,
-            month: item.month,
-            week: item.week,
-            skuDescription: item.skuDescription,
-            skuCode: item.skuCode,
-            status: item.status,
-            beginningSA: item.beginningSA,
-            beginningWA: item.beginningWA,
-            beginning: item.beginning,
-            delivery: item.delivery,
-            endingSA: item.endingSA,
-            endingWA: item.endingWA,
-            ending: item.ending,
-            expiryFields: item.expiryFields
-                ? item.expiryFields.map(field => `${field.expiryMonth || ""}: ${field.expiryPcs || ""}`).join(", ")
-                : "",
-            offtake: item.offtake,
-            inventoryDaysLevel: item.inventoryDaysLevel
-                ? item.inventoryDaysLevel.toFixed(2)
-                : "",
-            noOfDaysOOS: item.noOfDaysOOS,
-            remarksOOS: item.remarksOOS
-        }));
-
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet([]);
-
-        // Add headers and data
-        XLSX.utils.sheet_add_aoa(ws, [headers], { origin: "A1" });
-        XLSX.utils.sheet_add_json(ws, newData, { origin: "A2", skipHeader: true });
-
-        // Calculate dynamic column widths for SKU and Inventory Days Level
-        const colWidths = headers.map((header, index) => {
-            if (header === "SKU" || header === "Inventory Days Level") {
-                const maxLength = Math.max(
-                    header.length, // Length of the header
-                    ...newData.map(row => (row[Object.keys(row)[index]] || "").toString().length) // Length of data in the column
-                );
-                return { wch: maxLength + 6 }; // Add padding for better appearance
-            }
-            return { wch: Math.max(header.length, 15) }; // Default width for other columns
-        });
-
-        ws["!cols"] = colWidths;
-
-        // Apply bold styling to headers
-        headers.forEach((_, index) => {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: index });
-            if (!ws[cellAddress]) return;
-            ws[cellAddress].s = {
-                font: { bold: true },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-        });
-
-        // Apply center alignment to all data cells
-        newData.forEach((row, rowIndex) => {
-            Object.keys(row).forEach((_, colIndex) => {
-                const cellAddress = XLSX.utils.encode_cell({ r: rowIndex + 1, c: colIndex }); // Row index starts at 1 for data
-                if (!ws[cellAddress]) return;
-                ws[cellAddress].s = {
-                    alignment: { horizontal: "center", vertical: "center" }
-                };
-            });
-        });
-
-        XLSX.utils.book_append_sheet(wb, ws, "Inventory_Data");
-
-        const buffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `INVENTORY_DATA_ENGKANTO_${new Date().toISOString().split('T')[0]}.xlsx`;
-        document.body.appendChild(link);
-        link.click();
+      const buffer = XLSX.write(wb, { type: "array", bookType: "xlsx" });
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `INVENTORY_DATA_ENGKANTO_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
+      document.body.appendChild(link);
+      link.click();
     } catch (error) {
-        console.error(error);
-        alert("Error exporting data. Please try again.");
+      console.error(error);
+      alert("Error exporting data. Please try again.");
     }
-};
-
-
-
+  };
 
   return (
     <div className="attendance">
-      <Topbar />  
+      <Topbar />
       <div className="container">
         <Sidebar />
-        <div style={{ height: "100%", width: "85%",}}>
-          <Stack 
-            direction={{ xs: 'column', md: 'row',sm: 'row' }}
+        <div style={{ height: "100%", width: "85%" }}>
+          <Stack
+            direction={{ xs: "column", md: "row", sm: "row" }}
             spacing={{ xs: 1, sm: 2, md: 4 }}
-            sx={{ marginBottom: '20px' }}
-          >      
+            sx={{ marginBottom: "20px" }}
+          >
             <div className="MuiStack-root">
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Select Date"
                   onChange={(newValue) => setDateBegin(newValue)}
-                  slotProps={{ textField: { size: 'small' } }}
+                  slotProps={{ textField: { size: "small" } }}
                 />
               </LocalizationProvider>
-              
+
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Select Date"
                   onChange={(newValue) => setDateEnd(newValue)}
-                  slotProps={{ textField: { size: 'small' } }}
+                  slotProps={{ textField: { size: "small" } }}
                 />
               </LocalizationProvider>
-        
-              <Button onClick={getExportData} variant="contained" style={{marginLeft: 5}}>
+
+              <Button
+                onClick={getExportData}
+                variant="contained"
+                sx={{
+                  marginLeft: 1, // Equivalent to 5px spacing
+                  backgroundColor: "rgb(26, 20, 71)", // Custom background color
+                  color: "white", // Text color
+                  "&:hover": {
+                    backgroundColor: "rgb(40, 30, 100)", // Hover background color
+                  },
+                }}
+              >
                 Export
               </Button>
-             
             </div>
           </Stack>
 
@@ -523,7 +559,7 @@ export default function Inventory() {
             disableColumnFilter
             disableColumnSelector
             disableRowSelectionOnClick
-            disableDensitySelector       
+            disableDensitySelector
             pageSizeOptions={[5, 10, 20, 30, 50, 100]}
             getRowId={(row) => row.count}
           />
