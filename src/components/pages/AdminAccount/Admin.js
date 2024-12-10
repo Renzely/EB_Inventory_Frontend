@@ -35,7 +35,7 @@ import Swal from "sweetalert2";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { type } from "@testing-library/user-event/dist/type";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
 
 const style = {
   position: "absolute",
@@ -136,7 +136,9 @@ export default function Admin() {
   const [adminViewJDate, setAdminViewJDate] = React.useState("");
 
   const [openBranchModal, setOpenBranchModal] = React.useState(false);
-  const [selectedBranches, setSelectedBranches] = useState(adminViewBranch || []);
+  const [selectedBranches, setSelectedBranches] = useState(
+    adminViewBranch || []
+  );
 
   const [modalEmail, setModalEmail] = React.useState("");
 
@@ -149,9 +151,9 @@ export default function Admin() {
           branches: selectedBranches,
         }
       );
-  
+
       console.log("User branches updated:", response.data);
-  
+
       // Update the branch field in the userData state immediately
       const updatedUserData = userData.map((user) => {
         if (user.emailAddress === email) {
@@ -162,20 +164,22 @@ export default function Admin() {
         }
         return user;
       });
-  
+
       setUserData(updatedUserData);
-      
+
       handleCloseBranchModal();
-      
+
       // Refresh the page after closing the modal
       setTimeout(() => window.location.reload(), 1000);
     } catch (error) {
-      console.error("Error updating user branches:", error.response?.data || error.message);
+      console.error(
+        "Error updating user branches:",
+        error.response?.data || error.message
+      );
       handleCloseBranchModal();
     }
   };
-  
-  
+
   const refreshPage = () => {
     window.location.reload();
   };
@@ -183,37 +187,35 @@ export default function Admin() {
   const merchandiser = [];
 
   const branches = [
-  
-   "S&R ALABANG",
-"S&R NUVALI",
-"S&R BACOOR",
-"S&R IMUS",
-"S&R KAWIT",
-"S&R SUCAT",
-"S&R PARANAQUE",
-"S&R ASEANA",
-"S&R FORT",
-"S&R SHAW",
-"S&R CIRCUIT",
-"S&R COMMONWEALTH",
-"S&R CONGRESSIONAL",
-"S&R MARIKINA",
-"S&R C5 LIBIS",
-"S&R PAMPANGA",
-"S&R DAU",
-"S&R CEBU",
-"S&R ILOILO",
-"S&R LIPA",
-"S&R LUCENA",
-"S&R MALOLOS",
-"S&R NAGA",
-"S&R BACOLOD",
-"S&R CABANATUAN",
-"S&R CALASIAO",
-"S&R CDO",
-"S&R DAVAO",
-"Branch"
-
+    "S&R ALABANG",
+    "S&R NUVALI",
+    "S&R BACOOR",
+    "S&R IMUS",
+    "S&R KAWIT",
+    "S&R SUCAT",
+    "S&R PARANAQUE",
+    "S&R ASEANA",
+    "S&R FORT",
+    "S&R SHAW",
+    "S&R CIRCUIT",
+    "S&R COMMONWEALTH",
+    "S&R CONGRESSIONAL",
+    "S&R MARIKINA",
+    "S&R C5 LIBIS",
+    "S&R PAMPANGA",
+    "S&R DAU",
+    "S&R CEBU",
+    "S&R ILOILO",
+    "S&R LIPA",
+    "S&R LUCENA",
+    "S&R MALOLOS",
+    "S&R NAGA",
+    "S&R BACOLOD",
+    "S&R CABANATUAN",
+    "S&R CALASIAO",
+    "S&R CDO",
+    "S&R DAVAO",
+    "Branch",
   ];
 
   const handleRoleChange = (event) => {
@@ -309,7 +311,6 @@ export default function Admin() {
   const handleCloseBranchModal = () => {
     setOpenBranchModal(false);
   };
-  
 
   const handleOtpCodeChange = (e) => {
     if (e.target.value.length > 4) return;
@@ -580,7 +581,10 @@ export default function Admin() {
 
   async function getUser() {
     await axios
-      .post("https://eb-inventory-backend.onrender.com/get-admin-user", requestBody)
+      .post(
+        "https://eb-inventory-backend.onrender.com/get-admin-user",
+        requestBody
+      )
       .then(async (response) => {
         const data = await response.data.data;
 
@@ -605,7 +609,10 @@ export default function Admin() {
 
   async function setStatus() {
     await axios
-      .put("https://eb-inventory-backend.onrender.com/update-status", requestBody)
+      .put(
+        "https://eb-inventory-backend.onrender.com/update-status",
+        requestBody
+      )
       .then(async (response) => {
         const data = await response.data.data;
 
@@ -622,12 +629,15 @@ export default function Admin() {
       });
       return;
     }
-  
+
     try {
-      const response = await axios.post("https://eb-inventory-backend.onrender.com/send-otp-register", {
-        email: adminEmail,
-      });
-  
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/send-otp-register",
+        {
+          email: adminEmail,
+        }
+      );
+
       if (response.data.status === 200) {
         setOtpCode(response.data.code);
         setOpenDialog(true);
@@ -654,12 +664,12 @@ export default function Admin() {
       setInputOtpCodeError("OTP code does not match.");
       return;
     }
-  
+
     if (inputOtpCode.length < 4) {
       setInputOtpCodeError("Input must be 4 digits.");
       return;
     }
-  
+
     const userDetails = {
       roleAccount: adminSelectedRole,
       accountNameBranchManning: adminSelectedBranch.join(", "),
@@ -670,10 +680,13 @@ export default function Admin() {
       emailAddress: adminEmail,
       password: adminPassword,
     };
-  
+
     try {
-      const response = await axios.post("https://eb-inventory-backend.onrender.com/register-user-admin", userDetails);
-    
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/register-user-admin",
+        userDetails
+      );
+
       if (response.data.status === 200) {
         Swal.fire({
           title: "Success",
@@ -696,7 +709,7 @@ export default function Admin() {
         icon: "error",
       });
     }
-  }    
+  }
 
   React.useEffect(() => {
     getUser();
@@ -821,114 +834,139 @@ export default function Admin() {
           </DialogActions>
         </Dialog>
 
-        
+        <Modal
+          open={openViewModal}
+          onClose={handleViewCloseModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Stack spacing={3}>
+              <p>Full Details :</p>
+
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                <span className="detailTitle">OUTLETS:</span>{" "}
+                <span className="detailDescription">
+                  {Array.isArray(adminViewBranch)
+                    ? adminViewBranch.join(", ") // Display branches in text
+                    : adminViewBranch}
+                </span>
+                <br />
+                <br />
+              </Typography>
+
+              {/* Autocomplete with pre-selected branches */}
+              <Autocomplete
+                multiple
+                id="branches-autocomplete"
+                options={branches} // Available branch options
+                value={selectedBranches} // Pre-selected branches from state
+                onChange={(event, newValue) => setSelectedBranches(newValue)} // Update state on change
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Select Outlet"
+                    placeholder="Select Outlet"
+                  />
+                )}
+              />
+
+              {/* Buttons for Select All and Remove All */}
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="center" // Center the buttons horizontally
+                sx={{ marginBottom: 2 }} // Optional margin for spacing below
+              >
+                <Button
+                  onClick={() => setSelectedBranches(branches)} // Select all branches
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "rgb(220, 220, 255)", // Light background for "outlined" button
+                    color: "rgb(26, 20, 71)", // Text color
+                    borderColor: "rgb(26, 20, 71)", // Border color
+                    "&:hover": {
+                      backgroundColor: "rgb(190, 190, 255)", // Hover effect
+                    },
+                  }}
+                >
+                  Select All
+                </Button>
+                <Button
+                  onClick={() => setSelectedBranches([])} // Clear all selections
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "rgb(255, 220, 220)", // Light red background for "outlined" button
+                    color: "rgb(71, 20, 20)", // Text color
+                    borderColor: "rgb(71, 20, 20)", // Border color
+                    "&:hover": {
+                      backgroundColor: "rgb(255, 190, 190)", // Hover effect
+                    },
+                  }}
+                >
+                  Remove All
+                </Button>
+              </Stack>
+
+              <Button
+                onClick={() => handleBranchSave(adminViewEmail)} // Call save function
+                variant="contained"
+                sx={{
+                  backgroundColor: "rgb(26, 20, 71)", // Dark background color
+                  color: "white", // Text color
+                  "&:hover": {
+                    backgroundColor: "rgb(40, 30, 100)", // Hover background color
+                  },
+                }}
+              >
+                Save Outlet Changes
+              </Button>
+
+              <TextField
+                label="Email"
+                id="outlined-read-only-input"
+                defaultValue={adminViewEmail}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                label="Contact Number"
+                id="outlined-read-only-input"
+                defaultValue={adminViewPhone}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+
+              <DialogActions>
+                <Button onClick={handleViewCloseModal}>Close</Button>
+              </DialogActions>
+            </Stack>
+          </Box>
+        </Modal>
 
         <Modal
-  open={openViewModal}
-  onClose={handleViewCloseModal}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-    <Stack spacing={3}>
-      <p>Full Details :</p>
-
-      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-        <span className="detailTitle">OUTLETS:</span>{" "}
-        <span className="detailDescription">
-          {Array.isArray(adminViewBranch) 
-            ? adminViewBranch.join(", ") // Display branches in text
-            : adminViewBranch}
-        </span>
-        <br />
-        <br />
-      </Typography>
-
-      {/* Autocomplete with pre-selected branches */}
-      <Autocomplete
-        multiple
-        id="branches-autocomplete"
-        options={branches} // Available branch options
-        value={selectedBranches} // Pre-selected branches from state
-        onChange={(event, newValue) => setSelectedBranches(newValue)} // Update state on change
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="outlined"
-            label="Select Outlet"
-            placeholder="Select Outlet"
-          />
-        )}
-      />
-
-      {/* Buttons for Select All and Remove All */}
-      <Stack direction="row" spacing={2}>
-        <Button
-          onClick={() => setSelectedBranches(branches)} // Select all branches
-          variant="outlined"
+          open={openModal}
+          onClose={handleCloseDialog}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          tabindex="-1"
+          data-bs-focus="false"
         >
-          Select All
-        </Button>
-        <Button
-          onClick={() => setSelectedBranches([])} // Clear all selections
-          variant="outlined"
-        >
-          Remove All
-        </Button>
-      </Stack>
-
-      <Button 
-        onClick={() => handleBranchSave(adminViewEmail)} // Call save function
-        variant="contained"
-      >
-        Save Outlet Changes
-      </Button>
-
-      <TextField
-        label="Email"
-        id="outlined-read-only-input"
-        defaultValue={adminViewEmail}
-        InputProps={{
-          readOnly: true,
-        }}
-      />
-      <TextField
-        label="Contact Number"
-        id="outlined-read-only-input"
-        defaultValue={adminViewPhone}
-        InputProps={{
-          readOnly: true,
-        }}
-      />
-
-      <DialogActions>
-        <Button onClick={handleViewCloseModal}>Close</Button>
-      </DialogActions>
-    </Stack>
-  </Box>
-</Modal>
-
-
-<Modal
-  open={openModal}
-  onClose={handleCloseDialog}
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
-  tabindex="-1"
-  data-bs-focus="false"
->
-  <Box
-    component="form"
-    noValidate
-    sx={{
-      ...style,
-      maxHeight: "80vh", // Limit the height to 80% of the viewport
-      overflowY: "auto", // Enable scrolling when content exceeds the height
-    }}
-  >
-    <Typography id="modal-modal-title" variant="h6" component="h2">
-      Admin Details :
-    </Typography>
+          <Box
+            component="form"
+            noValidate
+            sx={{
+              ...style,
+              maxHeight: "80vh", // Limit the height to 80% of the viewport
+              overflowY: "auto", // Enable scrolling when content exceeds the height
+            }}
+          >
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Admin Details :
+            </Typography>
             {/* <Typography id="modal-modal-description" sx={{ mt: 2 }}> */}
 
             <FormControl fullWidth sx={{ m: 1 }}>
@@ -1078,9 +1116,6 @@ export default function Admin() {
             </DialogActions>
           </Box>
         </Modal>
-
-
-
       </div>
     </div>
   );

@@ -11,8 +11,6 @@ import Topbar from "../../topbar/Topbar";
 import Sidebar from "../../sidebar/Sidebar";
 import { format } from "date-fns";
 
-
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -42,15 +40,15 @@ const formatDateTime = (dateTime, isTimeIn = false) => {
 
   // Format the time in 12-hour h:mm AM/PM format
   const hours = adjustedDateObj.getHours() % 12 || 12; // Converts 0 to 12 for 12-hour format
-  const minutes = String(adjustedDateObj.getMinutes()).padStart(2, '0');
-  const ampm = adjustedDateObj.getHours() >= 12 ? 'PM' : 'AM';
+  const minutes = String(adjustedDateObj.getMinutes()).padStart(2, "0");
+  const ampm = adjustedDateObj.getHours() >= 12 ? "PM" : "AM";
 
   const formattedTime = `${hours}:${minutes} ${ampm}`;
 
-  return isTimeIn ? { date: formattedDate, time: formattedTime } : { date: formattedDate, time: formattedTime };
+  return isTimeIn
+    ? { date: formattedDate, time: formattedTime }
+    : { date: formattedDate, time: formattedTime };
 };
-
-
 
 export default function Attendance() {
   const [userData, setUserData] = React.useState([]);
@@ -74,7 +72,12 @@ export default function Attendance() {
       headerClassName: "bold-header",
     },
 
-    { field: "outlet", headerName: "OUTLET", width: 180, headerClassName: "bold-header" }, // New outlet column
+    {
+      field: "outlet",
+      headerName: "OUTLET",
+      width: 180,
+      headerClassName: "bold-header",
+    }, // New outlet column
     {
       field: "date",
       headerName: "DATE",
@@ -122,75 +125,81 @@ export default function Attendance() {
     },
   ];
 
-  async function fetchCurrentAttendance(emailAddress, currentDate = new Date()) {
+  async function fetchCurrentAttendance(
+    emailAddress,
+    currentDate = new Date()
+  ) {
     // Format date as dd-MM-yyyy
-    const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${currentDate.getFullYear()}`;
-  
+    const formattedDate = `${String(currentDate.getDate()).padStart(
+      2,
+      "0"
+    )}-${String(currentDate.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${currentDate.getFullYear()}`;
+
     try {
       const response = await axios.post(
         "https://eb-inventory-backend.onrender.com/get-attendance",
         { userEmail: emailAddress, date: formattedDate }
       );
       const data = response.data.data;
-  
+
       if (!Array.isArray(data)) {
-        throw new Error('Invalid data format');
+        throw new Error("Invalid data format");
       }
-  
+
       if (data.length === 0) {
         // No logs found, return default values
         return {
           date: formattedDate,
           timeIn: "No Time In",
           timeOut: "No Time Out",
-          accountNameBranchManning: ""
+          accountNameBranchManning: "",
         };
       }
-  
+
       const latestLog = data[data.length - 1];
-      const latestLogDate = latestLog.date.split('T')[0]; // Assuming date is in ISO format
-      const latestFormattedDate = latestLogDate
-        .split('-')
-        .reverse()
-        .join('-'); // Convert to dd-MM-yyyy
-  
+      const latestLogDate = latestLog.date.split("T")[0]; // Assuming date is in ISO format
+      const latestFormattedDate = latestLogDate.split("-").reverse().join("-"); // Convert to dd-MM-yyyy
+
       let accountNameBranchManning = latestLog.accountNameBranchManning || "";
-  
+
       if (latestFormattedDate !== formattedDate) {
         // New day has started, reset attendance and set branch to "No Branch"
         return {
           date: formattedDate,
           timeIn: "No Time In",
           timeOut: "No Time Out",
-          accountNameBranchManning: "No Branch"
+          accountNameBranchManning: "No Branch",
         };
       }
-  
+
       if (!latestLog.timeLogs || latestLog.timeLogs.length === 0) {
         return {
           date: formattedDate,
           timeIn: "No Time In",
           timeOut: "No Time Out",
-          accountNameBranchManning: accountNameBranchManning
+          accountNameBranchManning: accountNameBranchManning,
         };
       }
-  
+
       const timeLog = latestLog.timeLogs[latestLog.timeLogs.length - 1];
-  
+
       const timeIn = timeLog.timeIn
         ? formatDateTime(timeLog.timeIn).time
         : "No Time In";
       const timeOut = timeLog.timeOut
         ? formatDateTime(timeLog.timeOut).time
         : "No Time Out";
-  
+
       return {
         date: timeLog.timeIn
-          ? timeLog.timeIn.slice(0, 10).split('-').reverse().join('-')
+          ? timeLog.timeIn.slice(0, 10).split("-").reverse().join("-")
           : formattedDate,
         timeIn: timeIn,
         timeOut: timeOut,
-        accountNameBranchManning: accountNameBranchManning
+        accountNameBranchManning: accountNameBranchManning,
       };
     } catch (error) {
       console.error("Error fetching attendance:", error);
@@ -198,78 +207,89 @@ export default function Attendance() {
         date: formattedDate,
         timeIn: "Error",
         timeOut: "Error",
-        accountNameBranchManning: ""
+        accountNameBranchManning: "",
       };
     }
   }
-  
+
   const capitalizeWords = (words) => {
     if (!words || !Array.isArray(words)) return [];
-    
-    return words.map(word => 
-      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ''
+
+    return words.map((word) =>
+      word ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : ""
     );
   };
 
   async function getUser() {
     try {
       // Fetch the users' data
-      const response = await axios.post("https://eb-inventory-backend.onrender.com/get-all-user", body);
+      const response = await axios.post(
+        "https://eb-inventory-backend.onrender.com/get-all-user",
+        body
+      );
       const data = response.data.data;
-  
+
       // Retrieve the logged-in admin's branches from localStorage
       const loggedInBranch = localStorage.getItem("accountNameBranchManning");
-  
+
       if (!loggedInBranch) {
         console.error("No branch information found for the logged-in admin.");
         return;
       }
-  
+
       // Split the logged-in branches string into an array for comparison
-      const loggedInBranches = loggedInBranch.split(',').map(branch => branch.trim());
-  
+      const loggedInBranches = loggedInBranch
+        .split(",")
+        .map((branch) => branch.trim());
+
       // Process users
       const filteredData = await Promise.all(
         data.map(async (user, key) => {
-
           if (user.emailAddress === "ynsonharold@gmail.com") {
             return null;
           }
           // Fetch attendance for each user
-          const attendance = await fetchCurrentAttendance(user.emailAddress).catch(() => null);
-  
+          const attendance = await fetchCurrentAttendance(
+            user.emailAddress
+          ).catch(() => null);
+
           // Determine the displayed branch
           let displayedBranch = "No Branch";
-  
+
           if (attendance && attendance.timeIn) {
             // Check if attendance branch matches admin's branches
-            const isBranchMatching = loggedInBranches.some(branch =>
+            const isBranchMatching = loggedInBranches.some((branch) =>
               attendance.accountNameBranchManning.includes(branch)
             );
-  
+
             if (isBranchMatching) {
               displayedBranch = attendance.accountNameBranchManning; // Use attendance branch if it matches
             }
           }
-  
+
           // Exclude users whose branches do not match, even if they have attendance
-          if (displayedBranch === "No Branch" && !loggedInBranches.some(branch => user.accountNameBranchManning.includes(branch))) {
+          if (
+            displayedBranch === "No Branch" &&
+            !loggedInBranches.some((branch) =>
+              user.accountNameBranchManning.includes(branch)
+            )
+          ) {
             return null; // Exclude this user by returning null
           }
 
-           // Capitalize names
-        const capitalizedNames = capitalizeWords([
-          user.firstName,
-          user.middleName || '',
-          user.lastName
-        ]);
-  
+          // Capitalize names
+          const capitalizedNames = capitalizeWords([
+            user.firstName,
+            user.middleName || "",
+            user.lastName,
+          ]);
+
           // Include user data with attendance or placeholders
           return {
             count: key + 1,
             fullName: `${capitalizedNames[0]} ${capitalizedNames[2]}`,
             firstName: capitalizedNames[0],
-            middleName: capitalizedNames[1] || 'Null',
+            middleName: capitalizedNames[1] || "Null",
             lastName: capitalizedNames[2],
             emailAddress: user.emailAddress,
             outlet: displayedBranch, // Show branch based on attendance or "No Branch"
@@ -279,20 +299,17 @@ export default function Attendance() {
           };
         })
       );
-  
+
       // Remove null values (excluded users)
-      const validUsers = filteredData.filter(user => user !== null);
-  
+      const validUsers = filteredData.filter((user) => user !== null);
+
       // Set the filtered data to state
       setUserData(validUsers);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   }
-  
-  
-  
-  
+
   React.useEffect(() => {
     getUser();
   }, []);

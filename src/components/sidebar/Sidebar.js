@@ -4,7 +4,7 @@ import { Inventory, AssignmentInd, ManageAccounts } from "@mui/icons-material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
-import StoreIcon from '@mui/icons-material/Store';
+import StoreIcon from "@mui/icons-material/Store";
 import { useLocation } from "react-router-dom";
 import * as React from "react";
 
@@ -23,22 +23,21 @@ export default function Sidebar() {
   };
 
   const roleAccount = localStorage.getItem("roleAccount"); // Get roleAccount from localStorage
-  const firstName = localStorage.getItem("firstName");     // Get firstName from localStorage
-  const lastName = localStorage.getItem("lastName");       // Get lastName from localStorage
+  const firstName = localStorage.getItem("firstName"); // Get firstName from localStorage
+  const lastName = localStorage.getItem("lastName"); // Get lastName from localStorage
 
   return (
     <div className="sidebar">
-    <div className="sidebarWrapper">
-      {/* Display User Info */}
-      <div className="sidebarUserInfo">
-        <h4 className="sidebarUserName">
-          <span className="bold">NAME:</span> {firstName} {lastName}
-        </h4>
-        <p className="sidebarUserRole">
-          <span className="bold">ROLE:</span> {roleAccount}
-        </p>
-      </div>
-  
+      <div className="sidebarWrapper">
+        {/* Display User Info */}
+        <div className="sidebarUserInfo">
+          <h4 className="sidebarUserName">
+            <span className="bold">NAME:</span> {firstName} {lastName}
+          </h4>
+          <p className="sidebarUserRole">
+            <span className="bold">ROLE:</span> {roleAccount}
+          </p>
+        </div>
 
         {/* Sidebar Menu */}
         <div className="sidebarMenu">
@@ -58,23 +57,23 @@ export default function Sidebar() {
                 Accounts
               </li>
             </NavLink>
-            {(roleAccount === "ACCOUNT SUPERVISOR" || 
-            roleAccount === "OPERATION OFFICER" || 
-            roleAccount === "OPERATION HEAD") && (
-            <NavLink
-              to="/view-admin-accounts"
-              style={{ textDecoration: "none" }}
-              onClick={() => handleItemClick("/view-admin-accounts")}
-            >
-              <li
-                className={`sidebarListItem ${
-                  activeItem === "/view-admin-accounts" ? "active" : ""
-                }`}
+            {(roleAccount === "ACCOUNT SUPERVISOR" ||
+              roleAccount === "OPERATION OFFICER" ||
+              roleAccount === "OPERATION HEAD") && (
+              <NavLink
+                to="/view-admin-accounts"
+                style={{ textDecoration: "none" }}
+                onClick={() => handleItemClick("/view-admin-accounts")}
               >
-                <SupervisorAccountIcon className="sidebarIcon" />
-                Admin Account
-              </li>
-            </NavLink>
+                <li
+                  className={`sidebarListItem ${
+                    activeItem === "/view-admin-accounts" ? "active" : ""
+                  }`}
+                >
+                  <SupervisorAccountIcon className="sidebarIcon" />
+                  Admin Account
+                </li>
+              </NavLink>
             )}
 
             <NavLink
@@ -136,7 +135,6 @@ export default function Sidebar() {
               </li>
             </NavLink> */}
 
-            
             <li className="sidebarListItem" onClick={() => handleLogout()}>
               <LogoutIcon className="sidebarIcon" />
               Logout

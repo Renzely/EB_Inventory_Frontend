@@ -1,47 +1,48 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import * as React from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Swal from "sweetalert2";
-import EmailIcon from '@mui/icons-material/Email';
-import { Stack } from '@mui/material';
-import Modal from '@mui/material/Modal';
-import FormControl from '@mui/material/FormControl';
-import DialogActions from '@mui/material/DialogActions';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import IconButton from '@mui/material/IconButton';
+import EmailIcon from "@mui/icons-material/Email";
+import { Stack } from "@mui/material";
+import Modal from "@mui/material/Modal";
+import FormControl from "@mui/material/FormControl";
+import DialogActions from "@mui/material/DialogActions";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import IconButton from "@mui/material/IconButton";
 import { Visibility } from "@mui/icons-material";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: 'rgb(26, 20, 71)', // Green color
+      main: "rgb(26, 20, 71)", // Green color
     },
     background: {
-      default: '#ffffff', // White background
+      default: "#ffffff", // White background
     },
   },
 });
 
 export default function ForgotPassword() {
   const [otpComponent, setOtpComponent] = React.useState(false);
-  const [otpCode, setOtpCode] = React.useState('');
-  const [verifyOtpCode, setVerifyOtpCode] = React.useState('');
-  const [resetEmail, setResetEmail] = React.useState('');
-  const [openResetPasswordModal, setOpenResetPasswordModal] = React.useState(false);
-  const [password, setPassword] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = React.useState('');
+  const [otpCode, setOtpCode] = React.useState("");
+  const [verifyOtpCode, setVerifyOtpCode] = React.useState("");
+  const [resetEmail, setResetEmail] = React.useState("");
+  const [openResetPasswordModal, setOpenResetPasswordModal] =
+    React.useState(false);
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -52,19 +53,23 @@ export default function ForgotPassword() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const body = { emailAddress: data.get('email') };
+    const body = { emailAddress: data.get("email") };
 
     if (!body.emailAddress) {
       Swal.fire({
         title: "Unable to Proceed",
         text: "Please input your email",
-        icon: "warning"
+        icon: "warning",
       });
       return;
     }
 
-    await axios.post('https://eb-inventory-backend.onrender.com/send-otp-forgotpassword', body)
-      .then(async response => {
+    await axios
+      .post(
+        "https://eb-inventory-backend.onrender.com/send-otp-forgotpassword",
+        body
+      )
+      .then(async (response) => {
         const res = await response.data;
         if (res.status === 200) {
           setVerifyOtpCode(res.code);
@@ -74,42 +79,47 @@ export default function ForgotPassword() {
           Swal.fire({
             title: "Error!",
             text: res.data,
-            icon: "error"
+            icon: "error",
           });
         }
-      }).catch(() => {
+      })
+      .catch(() => {
         Swal.fire({
           title: "Error!",
           text: "Something wrong occurred",
-          icon: "error"
+          icon: "error",
         });
       });
   };
 
-  const handlePasswordChange = e => {
+  const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setPasswordError(e.target.value.length < 2 ? "Please enter a valid password" : false);
+    setPasswordError(
+      e.target.value.length < 2 ? "Please enter a valid password" : false
+    );
   };
 
-  const handleConfirmPasswordChange = e => {
+  const handleConfirmPasswordChange = (e) => {
     setConfirmPassword(e.target.value);
-    setConfirmPasswordError(e.target.value !== password ? "Password does not match!" : false);
+    setConfirmPasswordError(
+      e.target.value !== password ? "Password does not match!" : false
+    );
   };
 
   const handleCloseResetPasswordModal = (event, reason) => {
-    if (reason !== 'backdropClick') {
+    if (reason !== "backdropClick") {
       setOpenResetPasswordModal(false);
     }
   };
 
-  const handleOtpCodeChange = e => {
+  const handleOtpCodeChange = (e) => {
     if (e.target.value.length <= 4) setOtpCode(e.target.value);
   };
 
   const handleSubmitCode = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const inputCode = data.get('inputCode');
+    const inputCode = data.get("inputCode");
 
     if (inputCode === verifyOtpCode) {
       setOpenResetPasswordModal(true);
@@ -117,7 +127,7 @@ export default function ForgotPassword() {
       Swal.fire({
         title: "Unable to Proceed",
         text: "Code does not match",
-        icon: "warning"
+        icon: "warning",
       });
     }
   };
@@ -129,18 +139,22 @@ export default function ForgotPassword() {
       Swal.fire({
         title: "Unable to Proceed",
         text: "Please input a valid password",
-        icon: "warning"
+        icon: "warning",
       });
       return;
     }
 
     const body = {
       emailAddress: resetEmail,
-      password: password
+      password: password,
     };
 
-    axios.put('https://eb-inventory-backend.onrender.com/forgot-password-reset', body)
-      .then(async response => {
+    axios
+      .put(
+        "https://eb-inventory-backend.onrender.com/forgot-password-reset",
+        body
+      )
+      .then(async (response) => {
         const res = await response.data;
         if (res.status === 200) {
           Swal.fire({
@@ -150,23 +164,24 @@ export default function ForgotPassword() {
             confirmButtonColor: "#3085d6",
           }).then((result) => {
             if (result.isConfirmed) {
-              window.location.href = '/';
+              window.location.href = "/";
             } else {
-              window.location.href = '/';
+              window.location.href = "/";
             }
           });
         } else {
           Swal.fire({
             title: "Error!",
             text: res.data,
-            icon: "error"
+            icon: "error",
           });
         }
-      }).catch(() => {
+      })
+      .catch(() => {
         Swal.fire({
           title: "Error!",
           text: "Something wrong occurred",
-          icon: "error"
+          icon: "error",
         });
       });
   };
@@ -178,18 +193,23 @@ export default function ForgotPassword() {
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
             <EmailIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             FORGOT PASSWORD
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <Stack>
               <TextField
                 margin="normal"
@@ -202,13 +222,13 @@ export default function ForgotPassword() {
                 autoFocus
                 style={{ width: 300 }}
                 InputProps={{
-                  style: { color: '#000000' }
+                  style: { color: "#000000" },
                 }}
                 InputLabelProps={{
-                  style: { color: 'rgb(26, 20, 71)' }
+                  style: { color: "rgb(26, 20, 71)" },
                 }}
               />
-              {!otpComponent &&
+              {!otpComponent && (
                 <Button
                   type="submit"
                   variant="contained"
@@ -217,12 +237,17 @@ export default function ForgotPassword() {
                 >
                   Send OTP CODE
                 </Button>
-              }
+              )}
             </Stack>
           </Box>
 
-          {otpComponent &&
-            <Box component="form" onSubmit={handleSubmitCode} noValidate sx={{ mt: 1 }}>
+          {otpComponent && (
+            <Box
+              component="form"
+              onSubmit={handleSubmitCode}
+              noValidate
+              sx={{ mt: 1 }}
+            >
               <Stack>
                 <TextField
                   margin="normal"
@@ -236,19 +261,20 @@ export default function ForgotPassword() {
                   type="number"
                   style={{ width: 300 }}
                   sx={{
-                    "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
-                      display: "none",
-                    },
+                    "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                      {
+                        display: "none",
+                      },
                     "& input[type=number]": {
                       MozAppearance: "textfield",
                     },
                   }}
                   autoFocus
                   InputProps={{
-                    style: { color: '#000000' }
+                    style: { color: "#000000" },
                   }}
                   InputLabelProps={{
-                    style: { color: 'rgb(26, 20, 71)' }
+                    style: { color: "rgb(26, 20, 71)" },
                   }}
                 />
                 <Button
@@ -261,7 +287,7 @@ export default function ForgotPassword() {
                 </Button>
               </Stack>
             </Box>
-          }
+          )}
         </Box>
 
         <Modal
@@ -287,8 +313,8 @@ export default function ForgotPassword() {
                 onChange={handlePasswordChange}
                 error={!!passwordError}
                 helperText={passwordError}
-                type={showPassword ? 'text' : 'password'}
-                autoComplete='off'
+                type={showPassword ? "text" : "password"}
+                autoComplete="off"
                 InputProps={{
                   endAdornment: (
                     <IconButton
@@ -300,10 +326,10 @@ export default function ForgotPassword() {
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
-                  style: { color: 'rgb(26, 20, 71)' }
+                  style: { color: "rgb(26, 20, 71)" },
                 }}
                 InputLabelProps={{
-                  style: { color: 'rgb(26, 20, 71)' }
+                  style: { color: "rgb(26, 20, 71)" },
                 }}
               />
             </FormControl>
@@ -318,22 +344,18 @@ export default function ForgotPassword() {
                 error={!!confirmPasswordError}
                 helperText={confirmPasswordError}
                 type="password"
-                autoComplete='off'
+                autoComplete="off"
                 InputProps={{
-                  style: { color: 'rgb(26, 20, 71)' }
+                  style: { color: "rgb(26, 20, 71)" },
                 }}
                 InputLabelProps={{
-                  style: { color: 'rgb(26, 20, 71)' }
+                  style: { color: "rgb(26, 20, 71)" },
                 }}
               />
             </FormControl>
             <DialogActions>
-              <Button onClick={handleCloseResetPasswordModal}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmitResetPassword}>
-                Confirm
-              </Button>
+              <Button onClick={handleCloseResetPasswordModal}>Cancel</Button>
+              <Button onClick={handleSubmitResetPassword}>Confirm</Button>
             </DialogActions>
           </Box>
         </Modal>
@@ -343,13 +365,13 @@ export default function ForgotPassword() {
 }
 
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 600,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: "background.paper",
+  border: "2px solid #000",
   boxShadow: 24,
   p: 4,
 };
