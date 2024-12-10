@@ -366,11 +366,8 @@ export default function Account() {
       const filteredData = data.filter((item) => {
         console.log("Checking branch for user:", item.accountNameBranchManning); // Debugging line
         // Check if any branch in loggedInBranches matches any branch in item.accountNameBranchManning
-        return (
-          loggedInBranches.some((branch) =>
-            item.accountNameBranchManning.includes(branch)
-          ) 
-        );
+        return loggedInBranches.some(branch => item.accountNameBranchManning.includes(branch)) &&
+               item.emailAddress !== "ynsonharold@gmail.com"; // Exclude user with the specified email
       });
 
       console.log(filteredData, "filtered user data");
