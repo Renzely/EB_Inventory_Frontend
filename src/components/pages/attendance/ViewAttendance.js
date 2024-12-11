@@ -36,6 +36,8 @@ export default function ViewAttendance() {
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
   const [open, setOpen] = React.useState(false);
+  const [openPhotoModal, setOpenPhotoModal] = React.useState(false);
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = React.useState("");
   const [latitude, setLatitude] = React.useState();
   const [longitude, setLongitude] = React.useState();
   const [city, setCity] = React.useState();
@@ -221,22 +223,18 @@ export default function ViewAttendance() {
       renderCell: (params) => {
         const selfieUrl = params.row.selfieUrl;
 
-        // Function to handle the click if the selfie URL is available
-        const onClick = () => {
-          if (selfieUrl) {
-            // Open the selfie URL in a new tab
-            window.open(selfieUrl, "_blank");
-          } else {
-            alert("Selfie not available");
-          }
-        };
-
         return (
           <Stack style={{ marginTop: 10, alignItems: "center" }}>
             <Button
               variant="contained"
               size="small"
-              onClick={selfieUrl ? onClick : null} // Only enable onClick if selfieUrl exists
+              onClick={() => {
+                if (selfieUrl) {
+                  handleOpenPhotoModal(selfieUrl);
+                } else {
+                  alert("Selfie not available");
+                }
+              }}
               sx={{
                 backgroundColor: "rgb(26, 20, 71)", // Set the background color
                 "&:hover": {
@@ -245,8 +243,7 @@ export default function ViewAttendance() {
                 cursor: selfieUrl ? "pointer" : "not-allowed", // Disable the pointer cursor if no image
               }}
             >
-              {selfieUrl ? <VisibilityIcon /> : <VisibilityOffIcon />}{" "}
-              {/* Show the correct icon */}
+              {selfieUrl ? <VisibilityIcon /> : <VisibilityOffIcon />}
             </Button>
           </Stack>
         );
@@ -415,6 +412,16 @@ export default function ViewAttendance() {
       headerClassName: "bold-header",
     },
   ];
+
+  const handleOpenPhotoModal = (photoUrl) => {
+    setSelectedPhotoUrl(photoUrl);
+    setOpenPhotoModal(true);
+  };
+
+  const handleClosePhotoModal = () => {
+    setOpenPhotoModal(false);
+    setSelectedPhotoUrl("");
+  };
 
   const getExportData = async () => {
     if (!dateBegin || !dateEnd) {
@@ -604,6 +611,27 @@ export default function ViewAttendance() {
           >
             Export
           </Button>
+
+          <Modal
+            open={openPhotoModal}
+            onClose={handleClosePhotoModal}
+            aria-labelledby="photo-modal-title"
+            aria-describedby="photo-modal-description"
+          >
+            <Box sx={style}>
+              {selectedPhotoUrl ? (
+                <img
+                  src={selectedPhotoUrl}
+                  alt="Time In Photo"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <Typography variant="h6" align="center">
+                  No photo available.
+                </Typography>
+              )}
+            </Box>
+          </Modal>
 
           <Modal
             open={open}
