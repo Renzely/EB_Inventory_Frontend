@@ -216,44 +216,51 @@ export default function Inventory() {
 
   async function getUser() {
     try {
-      // Retrieve the logged-in admin's accountNameBranchManning from localStorage
       const loggedInBranch = localStorage.getItem("accountNameBranchManning");
-
-      console.log("Logged in branch:", loggedInBranch); // Debugging line
-
+  
       if (!loggedInBranch) {
         console.error("No branch information found for the logged-in admin.");
         return;
       }
-
-      // Fetch the inventory data
+  
       const response = await axios.post(
         "https://eb-inventory-backend.onrender.com/inventory-data"
       );
-
+  
       const data = response.data.data;
-      console.log(data, "backend response");
-
-      // Filter the data based on the logged-in admin's accountNameBranchManning
+  
       const filteredData = data.filter(
         (item) =>
           loggedInBranch.split(",").includes(item.accountNameBranchManning) &&
           item.userEmail !== "ynsonharold@gmail.com"
       );
 
-      // Sort the filtered data by date in descending order
-      const sortedData = filteredData.sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-
-      // Map the filtered and sorted data
+      function parseDate(dateStr) {
+        const [day, month, year] = dateStr.split('-').map(Number); // Split and convert to numbers
+        return new Date(year, month - 1, day); // Month is 0-indexed in JavaScript
+      }
+      
+      const sortedData = filteredData.sort((a, b) => {
+        const dateA = parseDate(a.date);
+        const dateB = parseDate(b.date);
+      
+        // Check for invalid dates
+        if (isNaN(dateA) || isNaN(dateB)) {
+          console.error("Invalid date detected:", a.date, b.date);
+          return 0; // Keep the original order if invalid
+        }
+      
+        return dateB - dateA; // Descending order
+      });
+      
+  
       const newData = sortedData.map((data, key) => {
         const value = (status, defaultValue) => {
           if (status === "Delisted") return "Delisted";
           if (status === "Not Carried") return "NC";
           return defaultValue || 0;
         };
-
+  
         return {
           count: key + 1,
           date: data.date,
@@ -275,19 +282,22 @@ export default function Inventory() {
           endingWA: value(data.status, data.endingWA),
           ending: value(data.status, data.ending),
           offtake: value(data.status, data.offtake),
-          inventoryDaysLevel: value(data.status, data.inventoryDaysLevel),
+          inventoryDaysLevel: value(data.status, data.inventoryDaysLevel)
+          ? Math.round(value(data.status, data.inventoryDaysLevel)) // Round IDL
+          : "", // Handle empty or invalid values
           noOfDaysOOS: value(data.status, data.noOfDaysOOS),
           remarksOOS: data.remarksOOS,
           expiryFields: data.expiryFields, // Ensure expiryFields is included
         };
       });
-
+  
       console.log(newData, "mapped data");
-      setUserData(newData); // Set the filtered data for rendering
+      setUserData(newData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
+  
 
   async function getDate(selectedDate) {
     const data = { selectDate: selectedDate };
@@ -365,51 +375,45 @@ export default function Inventory() {
         }
       );
 
-      const headers = [
-        "#",
-        "Inventory Number",
-        "Date",
-        "Fullname",
+      const headers = [   
+        "Date",   
         "Outlet",
-        "Weeks Covered",
-        "Month",
-        "Week",
         "SKU",
-        "4-Pack Barcode",
-        "Status",
-        "BeginningSA",
-        "BeginningWA",
         "Beginning",
-        "Delivery",
-        "EndingSA",
-        "EndingWA",
         "Ending",
-        "Expiry Fields",
         "Offtake",
         "Inventory Days Level",
-        "No of Days OOS",
-        "Remarks OOS",
+        "Expiry Fields",
       ];
 
-      const newData = response.data.data.map((item, key) => ({
-        count: key + 1,
-        inputId: item.inputId,
+      const newData = response.data.data
+      .sort((a, b) => {
+        const parseDate = (dateStr) => {
+          const [day, month, year] = dateStr.split("-").map(Number); // Split and convert to numbers
+          return new Date(year, month - 1, day); // Month is 0-indexed
+        };
+    
+        const dateA = parseDate(a.date);
+        const dateB = parseDate(b.date);
+    
+        // Check for invalid dates
+        if (isNaN(dateA) || isNaN(dateB)) {
+          console.error("Invalid date detected:", a.date, b.date);
+          return 0; // Keep the original order if invalid
+        }
+    
+        return dateB - dateA; // Sort in descending order
+      })
+      .map((item, key) => ({
         date: item.date,
-        name: item.name,
         accountNameBranchManning: item.accountNameBranchManning,
-        period: item.period,
-        month: item.month,
-        week: item.week,
         skuDescription: item.skuDescription,
-        skuCode: item.skuCode,
-        status: item.status,
-        beginningSA: item.beginningSA,
-        beginningWA: item.beginningWA,
         beginning: item.beginning,
-        delivery: item.delivery,
-        endingSA: item.endingSA,
-        endingWA: item.endingWA,
         ending: item.ending,
+        offtake: item.offtake,
+        inventoryDaysLevel: item.inventoryDaysLevel
+          ? Math.round(item.inventoryDaysLevel) // Rounds to the nearest whole number
+          : "",
         expiryFields: item.expiryFields
           ? item.expiryFields
               .map(
@@ -418,13 +422,8 @@ export default function Inventory() {
               )
               .join(", ")
           : "",
-        offtake: item.offtake,
-        inventoryDaysLevel: item.inventoryDaysLevel
-          ? item.inventoryDaysLevel.toFixed(2)
-          : "",
-        noOfDaysOOS: item.noOfDaysOOS,
-        remarksOOS: item.remarksOOS,
       }));
+    
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet([]);
