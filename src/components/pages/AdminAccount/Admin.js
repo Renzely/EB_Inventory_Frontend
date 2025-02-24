@@ -695,7 +695,7 @@ export default function Admin() {
           confirmButtonColor: "#3085d6",
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.reload();
+            window.location.href = "/login"; // Redirect to login page
           }
         });
       } else {
@@ -705,7 +705,9 @@ export default function Admin() {
       console.error("Error creating user:", error);
       Swal.fire({
         title: "Error",
-        text: error.message || "Failed to create user. Please try again.",
+        text:
+          error.response?.data?.message ||
+          "Failed to create user. Please try again.",
         icon: "error",
       });
     }
