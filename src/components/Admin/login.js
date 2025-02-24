@@ -13,6 +13,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Swal from "sweetalert2";
 import logo from "./Studio-Project.png";
+import backgroundImage from "./engkanto_logo.png";
 
 const theme = createTheme({
   palette: {
@@ -99,84 +100,135 @@ export default function Login() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
+      <Grid
+        container
+        sx={{
+          height: "100vh",
+          background:
+            "linear-gradient(135deg, #1A133B, #221C49, #3B335E, #E2B616)", // Three-color gradient background
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 2,
+        }}
+      >
         <CssBaseline />
+
+        {/* Floating Box Container */}
         <Box
           sx={{
-            marginTop: 8,
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            width: { xs: "90%", sm: "80%", md: "70%" },
+            height: { xs: "90%", sm: "75%", md: "65%" },
+            borderRadius: 5,
+            overflow: "hidden",
+            boxShadow: 10,
+            backgroundColor: "rgba(255, 255, 255, 0.9)", // Light transparency
           }}
         >
-          <img
-            src={logo}
-            alt="Logo"
-            style={{ width: "150px", marginBottom: "16px" }}
+          {/* Left side - Image */}
+          {/* Left side - Image (Hidden on Mobile) */}
+          <Grid
+            item
+            xs={false} // Hides this on extra-small screens (mobile)
+            sm={6} // Shows this on small screens and above
+            sx={{
+              backgroundImage: `url(${backgroundImage})`,
+              backgroundSize: "100% 100%",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+              minHeight: "100%",
+              display: { xs: "none", sm: "block" }, // Hide on mobile, show on larger screens
+            }}
           />
-          <Typography component="h1" variant="h5">
-            SIGN IN
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
+
+          {/* Right side - Login Form */}
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 4,
+            }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              InputProps={{
-                style: { color: "#000000" },
-              }}
-              InputLabelProps={{
-                style: { color: "rgb(26, 20, 71)" },
-              }}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              InputProps={{
-                style: { color: "#000000" },
-              }}
-              InputLabelProps={{
-                style: { color: "rgb(26, 20, 71)" },
-              }}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              SIGN IN
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link
-                  href="/forgotpassword"
-                  variant="body2"
-                  style={{ color: "rgb(26, 20, 71)" }}
+            <Container maxWidth="xs">
+              <Box
+                component="form"
+                noValidate
+                sx={{ mt: 2 }}
+                onSubmit={handleSubmit}
+              >
+                {/* Center the logo */}
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                  <img src={logo} alt="Logo" style={{ width: "80px" }} />
+                </Box>
+
+                {/* Center the LOGIN text */}
+                <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                  <Typography
+                    component="h1"
+                    variant="h5"
+                    fontWeight="bold"
+                    color="#384959"
+                  >
+                    ADMIN LOGIN
+                  </Typography>
+                </Box>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    mt: 3,
+                    mb: 2,
+                    backgroundColor: "#3B335E",
+                    fontWeight: "bold",
+                    "&:hover": {
+                      backgroundColor: "#221C49",
+                    },
+                  }}
                 >
-                  Forgot password?
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
+                  LOGIN
+                </Button>
+                <Grid container>
+                  <Grid item xs>
+                    <Link
+                      href="/forgotpassword"
+                      variant="body2"
+                      color="#384959"
+                    >
+                      Forgot password?
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Container>
+          </Grid>
         </Box>
-      </Container>
+      </Grid>
     </ThemeProvider>
   );
 }
