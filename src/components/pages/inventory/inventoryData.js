@@ -217,18 +217,18 @@ export default function Inventory() {
   async function getUser() {
     try {
       const loggedInBranch = localStorage.getItem("accountNameBranchManning");
-  
+
       if (!loggedInBranch) {
         console.error("No branch information found for the logged-in admin.");
         return;
       }
-  
+
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/inventory-data"
+        "https://engkanto.onrender.com/inventory-data"
       );
-  
+
       const data = response.data.data;
-  
+
       const filteredData = data.filter(
         (item) =>
           loggedInBranch.split(",").includes(item.accountNameBranchManning) &&
@@ -236,31 +236,30 @@ export default function Inventory() {
       );
 
       function parseDate(dateStr) {
-        const [day, month, year] = dateStr.split('-').map(Number); // Split and convert to numbers
+        const [day, month, year] = dateStr.split("-").map(Number); // Split and convert to numbers
         return new Date(year, month - 1, day); // Month is 0-indexed in JavaScript
       }
-      
+
       const sortedData = filteredData.sort((a, b) => {
         const dateA = parseDate(a.date);
         const dateB = parseDate(b.date);
-      
+
         // Check for invalid dates
         if (isNaN(dateA) || isNaN(dateB)) {
           console.error("Invalid date detected:", a.date, b.date);
           return 0; // Keep the original order if invalid
         }
-      
+
         return dateB - dateA; // Descending order
       });
-      
-  
+
       const newData = sortedData.map((data, key) => {
         const value = (status, defaultValue) => {
           if (status === "Delisted") return "Delisted";
           if (status === "Not Carried") return "NC";
           return defaultValue || 0;
         };
-  
+
         return {
           count: key + 1,
           date: data.date,
@@ -283,26 +282,25 @@ export default function Inventory() {
           ending: value(data.status, data.ending),
           offtake: value(data.status, data.offtake),
           inventoryDaysLevel: value(data.status, data.inventoryDaysLevel)
-          ? Math.round(value(data.status, data.inventoryDaysLevel)) // Round IDL
-          : "", // Handle empty or invalid values
+            ? Math.round(value(data.status, data.inventoryDaysLevel)) // Round IDL
+            : "", // Handle empty or invalid values
           noOfDaysOOS: value(data.status, data.noOfDaysOOS),
           remarksOOS: data.remarksOOS,
           expiryFields: data.expiryFields, // Ensure expiryFields is included
         };
       });
-  
+
       console.log(newData, "mapped data");
       setUserData(newData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  
 
   async function getDate(selectedDate) {
     const data = { selectDate: selectedDate };
     await axios
-      .post("https://eb-inventory-backend.onrender.com/filter-date", data)
+      .post("https://engkanto.onrender.com/filter-date", data)
       .then(async (response) => {
         const data = await response.data.data;
         console.log(data, "test");
@@ -368,15 +366,15 @@ export default function Inventory() {
 
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/export-inventory-data",
+        "https://engkanto.onrender.com/export-inventory-data",
         {
           start: bDate,
           end: eDate,
         }
       );
 
-      const headers = [   
-        "Date",   
+      const headers = [
+        "Date",
         "Outlet",
         "SKU",
         "Beginning",
@@ -387,43 +385,42 @@ export default function Inventory() {
       ];
 
       const newData = response.data.data
-      .sort((a, b) => {
-        const parseDate = (dateStr) => {
-          const [day, month, year] = dateStr.split("-").map(Number); // Split and convert to numbers
-          return new Date(year, month - 1, day); // Month is 0-indexed
-        };
-    
-        const dateA = parseDate(a.date);
-        const dateB = parseDate(b.date);
-    
-        // Check for invalid dates
-        if (isNaN(dateA) || isNaN(dateB)) {
-          console.error("Invalid date detected:", a.date, b.date);
-          return 0; // Keep the original order if invalid
-        }
-    
-        return dateB - dateA; // Sort in descending order
-      })
-      .map((item, key) => ({
-        date: item.date,
-        accountNameBranchManning: item.accountNameBranchManning,
-        skuDescription: item.skuDescription,
-        beginning: item.beginning,
-        ending: item.ending,
-        offtake: item.offtake,
-        inventoryDaysLevel: item.inventoryDaysLevel
-          ? Math.round(item.inventoryDaysLevel) // Rounds to the nearest whole number
-          : "",
-        expiryFields: item.expiryFields
-          ? item.expiryFields
-              .map(
-                (field) =>
-                  `${field.expiryMonth || ""}: ${field.expiryPcs || ""}`
-              )
-              .join(", ")
-          : "",
-      }));
-    
+        .sort((a, b) => {
+          const parseDate = (dateStr) => {
+            const [day, month, year] = dateStr.split("-").map(Number); // Split and convert to numbers
+            return new Date(year, month - 1, day); // Month is 0-indexed
+          };
+
+          const dateA = parseDate(a.date);
+          const dateB = parseDate(b.date);
+
+          // Check for invalid dates
+          if (isNaN(dateA) || isNaN(dateB)) {
+            console.error("Invalid date detected:", a.date, b.date);
+            return 0; // Keep the original order if invalid
+          }
+
+          return dateB - dateA; // Sort in descending order
+        })
+        .map((item, key) => ({
+          date: item.date,
+          accountNameBranchManning: item.accountNameBranchManning,
+          skuDescription: item.skuDescription,
+          beginning: item.beginning,
+          ending: item.ending,
+          offtake: item.offtake,
+          inventoryDaysLevel: item.inventoryDaysLevel
+            ? Math.round(item.inventoryDaysLevel) // Rounds to the nearest whole number
+            : "",
+          expiryFields: item.expiryFields
+            ? item.expiryFields
+                .map(
+                  (field) =>
+                    `${field.expiryMonth || ""}: ${field.expiryPcs || ""}`
+                )
+                .join(", ")
+            : "",
+        }));
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet([]);

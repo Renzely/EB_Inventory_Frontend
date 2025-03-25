@@ -47,7 +47,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/login-admin",
+        "https://engkanto.onrender.com/login-admin",
         body
       );
       const data = await response.data;

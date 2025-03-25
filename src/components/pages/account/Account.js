@@ -132,7 +132,7 @@ export default function Account() {
     try {
       // Update the user's branches with the selected branches
       const response = await axios.put(
-        "https://eb-inventory-backend.onrender.com/update-user-branch",
+        "https://engkanto.onrender.com/update-user-branch",
         {
           emailAddress: modalEmail,
           branches: selectedBranches,
@@ -354,7 +354,7 @@ export default function Account() {
 
       // Send request to get all user data
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/get-all-user",
+        "https://engkanto.onrender.com/get-all-user",
         requestBody
       );
 
@@ -366,8 +366,11 @@ export default function Account() {
       const filteredData = data.filter((item) => {
         console.log("Checking branch for user:", item.accountNameBranchManning); // Debugging line
         // Check if any branch in loggedInBranches matches any branch in item.accountNameBranchManning
-        return loggedInBranches.some(branch => item.accountNameBranchManning.includes(branch)) &&
-               item.emailAddress !== "ynsonharold@gmail.com"; // Exclude user with the specified email
+        return (
+          loggedInBranches.some((branch) =>
+            item.accountNameBranchManning.includes(branch)
+          ) && item.emailAddress !== "ynsonharold@gmail.com"
+        ); // Exclude user with the specified email
       });
 
       console.log(filteredData, "filtered user data");
@@ -403,10 +406,7 @@ export default function Account() {
   async function setStatus() {
     console.log("check body", requestBody);
     await axios
-      .put(
-        "https://eb-inventory-backend.onrender.com/update-status",
-        requestBody
-      )
+      .put("https://engkanto.onrender.com/update-status", requestBody)
       .then(async (response) => {
         const data = await response.data.data;
 

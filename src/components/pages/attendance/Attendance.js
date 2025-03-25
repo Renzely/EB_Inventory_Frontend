@@ -140,7 +140,7 @@ export default function Attendance() {
 
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/get-attendance",
+        "https://engkanto.onrender.com/get-attendance",
         { userEmail: emailAddress, date: formattedDate }
       );
       const data = response.data.data;
@@ -224,7 +224,7 @@ export default function Attendance() {
     try {
       // Fetch the users' data
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/get-all-user",
+        "https://engkanto.onrender.com/get-all-user",
         body
       );
       const data = response.data.data;

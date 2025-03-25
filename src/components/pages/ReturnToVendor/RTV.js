@@ -157,7 +157,7 @@ export default function RTV() {
 
       // Fetch RTV data
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/retrieve-RTV-data"
+        "https://engkanto.onrender.com/retrieve-RTV-data"
       );
 
       const data = response.data?.data || [];
@@ -205,7 +205,7 @@ export default function RTV() {
   async function getDateRTV(selectedDate) {
     const data = { selectDate: selectedDate };
     await axios
-      .post("https://eb-inventory-backend.onrender.com/filter-RTV-data", data)
+      .post("https://engkanto.onrender.com/filter-RTV-data", data)
       .then(async (response) => {
         const data = await response.data.data;
         console.log(data, "test");
@@ -249,7 +249,7 @@ export default function RTV() {
 
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/export-RTV-data",
+        "https://engkanto.onrender.com/export-RTV-data",
         {
           start: bDate,
           end: eDate,
