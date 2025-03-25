@@ -436,7 +436,7 @@ const skus = {
 
 export default function OUTLET() {
   const [branches, setBranches] = React.useState([
-  "PUREGOLD PRICE CLUB - LA TRINIDAD BENGUET",
+    "PUREGOLD PRICE CLUB - LA TRINIDAD BENGUET",
     "PUREGOLD PRICE CLUB - BAGUIO",
     "PUREGOLD PRICE CLUB - LAOAG",
     "PUREGOLD PRICE CLUB (JR.)- OLD CENTRO",
@@ -854,7 +854,7 @@ export default function OUTLET() {
     "PUREGOLD - TALISAY",
     "PUREGOLD - GUADALUPE",
     "PUREGOLD- KASAMBAGAN",
-    "PUREGOLD PRICE CLUB - SINDALAN"
+    "PUREGOLD PRICE CLUB - SINDALAN",
   ]);
 
   const [open, setOpen] = React.useState(false);
@@ -929,7 +929,7 @@ export default function OUTLET() {
     if (statusCategory && selectedStatus) {
       try {
         const response = await fetch(
-          `https://eb-inventory-backend.onrender.com/get-skus-by-status?branch=${encodeURIComponent(
+          `https://engkanto.onrender.com/get-skus-by-status?branch=${encodeURIComponent(
             selectedBranch
           )}&statusCategory=${encodeURIComponent(
             statusCategory
@@ -1095,7 +1095,7 @@ export default function OUTLET() {
 
     try {
       const response = await fetch(
-        `https://eb-inventory-backend.onrender.com/get-skus?accountNameBranchManning=${encodeURIComponent(
+        `https://engkanto.onrender.com/get-skus?accountNameBranchManning=${encodeURIComponent(
           branch
         )}`
       );
@@ -1131,7 +1131,7 @@ export default function OUTLET() {
       }));
 
       const response = await fetch(
-        "https://eb-inventory-backend.onrender.com/save-branch-sku",
+        "https://engkanto.onrender.com/save-branch-sku",
         {
           method: "POST",
           body: JSON.stringify({
@@ -1190,19 +1190,22 @@ export default function OUTLET() {
     }
 
     try {
-      const response = await fetch("https://eb-inventory-backend.onrender.com/disable-sku", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          branch: selectedBranch, // Replace with the actual branch identifier
-          category: selectedCategory,
-          skuDescription: selectedSku,
-          enabled: false, // Set SKU as disabled
-          status: "Not Carried", // Add a status tag
-        }),
-      });
+      const response = await fetch(
+        "https://engkanto.onrender.com/disable-sku",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            branch: selectedBranch, // Replace with the actual branch identifier
+            category: selectedCategory,
+            skuDescription: selectedSku,
+            enabled: false, // Set SKU as disabled
+            status: "Not Carried", // Add a status tag
+          }),
+        }
+      );
 
       if (response.ok) {
         alert("SKU has been disabled.");
@@ -1223,7 +1226,7 @@ export default function OUTLET() {
     }
 
     try {
-      const response = await fetch("https://eb-inventory-backend.onrender.com/enable-sku", {
+      const response = await fetch("https://engkanto.onrender.com/enable-sku", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1258,19 +1261,22 @@ export default function OUTLET() {
     }
 
     try {
-      const response = await fetch("https://eb-inventory-backend.onrender.com/delisted-sku", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          branch: selectedBranch, // Use the selected branch state
-          category: selectedCategory,
-          skuDescription: selectedSku,
-          enabled: false, // Set SKU as disabled
-          status: "Delisted", // Add a status tag
-        }),
-      });
+      const response = await fetch(
+        "https://engkanto.onrender.com/delisted-sku",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            branch: selectedBranch, // Use the selected branch state
+            category: selectedCategory,
+            skuDescription: selectedSku,
+            enabled: false, // Set SKU as disabled
+            status: "Delisted", // Add a status tag
+          }),
+        }
+      );
 
       if (response.ok) {
         alert("SKU has been marked as Delisted.");
@@ -1293,7 +1299,7 @@ export default function OUTLET() {
 
     try {
       const response = await fetch(
-        "https://eb-inventory-backend.onrender.com/update-sku-status",
+        "https://engkanto.onrender.com/update-sku-status",
         {
           method: "POST",
           headers: {

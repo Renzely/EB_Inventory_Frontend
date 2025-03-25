@@ -56,7 +56,7 @@ export default function ForgotPassword() {
 
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/send-otp-forgotpassword",
+        "https://engkanto.onrender.com/send-otp-forgotpassword",
         { emailAddress: email }
       );
       const res = response.data;
@@ -99,10 +99,7 @@ export default function ForgotPassword() {
     };
 
     axios
-      .put(
-        "https://eb-inventory-backend.onrender.com/forgot-password-reset",
-        body
-      )
+      .put("https://engkanto.onrender.com/forgot-password-reset", body)
       .then(async (response) => {
         const res = await response.data;
         if (res.status === 200) {

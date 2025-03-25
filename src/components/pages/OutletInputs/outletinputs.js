@@ -34,7 +34,7 @@ export default function OUTLET() {
     "S&R CABANATUAN",
     "S&R CALASIAO",
     "S&R CDO",
-    "S&R DAVAO"
+    "S&R DAVAO",
   ]);
 
   const [inventoryCount, setInventoryCount] = React.useState({});
@@ -53,7 +53,7 @@ export default function OUTLET() {
 
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/filter-date",
+        "https://engkanto.onrender.com/filter-date",
         data
       );
       const inventoryData = response.data.data;
@@ -65,7 +65,6 @@ export default function OUTLET() {
           counts[branch] = (counts[branch] || 0) + 1;
         }
       });
-      
 
       setInventoryCount(counts);
     } catch (error) {
@@ -76,18 +75,18 @@ export default function OUTLET() {
   const fetchUsersByBranch = async (branch) => {
     try {
       const response = await axios.post(
-        "https://eb-inventory-backend.onrender.com/get-users-by-branch",
+        "https://engkanto.onrender.com/get-users-by-branch",
         { branch }
       );
       const users = response.data.users;
-  
+
       // Map users to include branch explicitly
       const userBranchMap = users.map((user) => ({
         id: user._id,
         name: user.name,
-        branch: user.accountNameBranchManning // Include branch explicitly
+        branch: user.accountNameBranchManning, // Include branch explicitly
       }));
-  
+
       // Set users for the modal
       setUsers(userBranchMap);
       setSelectedBranch(branch);
@@ -96,7 +95,6 @@ export default function OUTLET() {
       console.error("Error fetching users:", error);
     }
   };
-  
 
   React.useEffect(() => {
     fetchInventoryCount(); // Fetch data when the component mounts
@@ -182,32 +180,31 @@ export default function OUTLET() {
 
           {/* Modal to display users */}
           <Modal open={open} onClose={() => setOpen(false)}>
-  <Box
-    sx={{
-      padding: 4,
-      backgroundColor: "white",
-      margin: "auto",
-      width: "50%"
-    }}
-  >
-    <Typography variant="h6">
-      Merchandisers for Branch: {selectedBranch}
-    </Typography>
-    <ul>
-      {users.length > 0 ? (
-        users.map((user) => (
-          <li key={user.id}>
-            {user.name} - Branch: {user.branch}
-          </li>
-        ))
-      ) : (
-        <Typography>No users available for this branch</Typography>
-      )}
-    </ul>
-    <Button onClick={() => setOpen(false)}>Close</Button>
-  </Box>
-</Modal>
-
+            <Box
+              sx={{
+                padding: 4,
+                backgroundColor: "white",
+                margin: "auto",
+                width: "50%",
+              }}
+            >
+              <Typography variant="h6">
+                Merchandisers for Branch: {selectedBranch}
+              </Typography>
+              <ul>
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <li key={user.id}>
+                      {user.name} - Branch: {user.branch}
+                    </li>
+                  ))
+                ) : (
+                  <Typography>No users available for this branch</Typography>
+                )}
+              </ul>
+              <Button onClick={() => setOpen(false)}>Close</Button>
+            </Box>
+          </Modal>
         </div>
       </div>
     </div>
