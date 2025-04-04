@@ -116,6 +116,8 @@ export default function Account() {
     "S&R CALASIAO",
     "S&R CDO",
     "S&R DAVAO",
+    "S&R NEW MANILA",
+    "S&R STO. TOMAS",
   ]); //Branches
 
   // State for the second modal
