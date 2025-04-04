@@ -215,6 +215,8 @@ export default function Admin() {
     "S&R CALASIAO",
     "S&R CDO",
     "S&R DAVAO",
+    "S&R NEW MANILA",
+    "S&R STO. TOMAS",
     "Branch",
   ];
 
