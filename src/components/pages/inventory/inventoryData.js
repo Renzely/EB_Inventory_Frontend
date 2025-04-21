@@ -236,21 +236,34 @@ export default function Inventory() {
       );
 
       function parseDate(dateStr) {
-        const [day, month, year] = dateStr.split("-").map(Number); // Split and convert to numbers
-        return new Date(year, month - 1, day); // Month is 0-indexed in JavaScript
+        if (!dateStr) return new Date("Invalid Date");
+
+        // Check if format is yyyy-mm-dd
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          return new Date(dateStr);
+        }
+
+        // Check if format is dd-mm-yyyy
+        if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+          const [day, month, year] = dateStr.split("-").map(Number);
+          return new Date(year, month - 1, day); // Month is 0-indexed
+        }
+
+        // Fallback for unknown formats
+        console.error("Unknown date format:", dateStr);
+        return new Date("Invalid Date");
       }
 
       const sortedData = filteredData.sort((a, b) => {
         const dateA = parseDate(a.date);
         const dateB = parseDate(b.date);
 
-        // Check for invalid dates
         if (isNaN(dateA) || isNaN(dateB)) {
           console.error("Invalid date detected:", a.date, b.date);
-          return 0; // Keep the original order if invalid
+          return 0; // Keep original order if any date is invalid
         }
 
-        return dateB - dateA; // Descending order
+        return dateB - dateA; // Descending (latest first)
       });
 
       const newData = sortedData.map((data, key) => {
